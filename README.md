@@ -62,3 +62,7 @@ Golang V1.17
 ###### 3、设置环境变量：
  - using env:   export GIN_MODE=release
  - using code:  gin.SetMode(gin.ReleaseMode)
+
+
+删除.DS_Store文件
+ find . -name .DS_Store -print0 | xargs -0 git rm -f --ignore-unmatch

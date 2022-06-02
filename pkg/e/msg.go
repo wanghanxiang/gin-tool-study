@@ -17,6 +17,8 @@ var MsgFlags = map[int]string{
 	ErrorNotExistAddress:    "该收获地址不存在",
 	ErrorExistFavorite:      "已收藏该商品",
 
+	ErrorAuthToken: "Token错误",
+
 	ErrorDatabase: "数据库操作出错,请重试",
 
 	ErrorOss: "OSS配置错误",
