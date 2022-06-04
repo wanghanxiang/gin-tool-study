@@ -28,6 +28,7 @@ type SendEmailService struct {
 type ValidEmailService struct {
 }
 
+//注册
 func (service UserService) Register() serializer.Response {
 	var user model.User
 	var count int64
@@ -55,7 +56,6 @@ func (service UserService) Register() serializer.Response {
 		Status:   model.Active,
 		Money:    util.Encrypt.AesEncoding("10000"),
 	}
-	//加密密码
 	if err := user.SetPassword(service.Password); err != nil {
 		logging.Info(err)
 		code = e.ErrorFailEncryption
@@ -80,7 +80,7 @@ func (service UserService) Register() serializer.Response {
 	}
 }
 
-//Login 用户登陆函数
+//用户登陆函数
 func (service UserService) Login() serializer.Response {
 	var user model.User
 	code := e.SUCCESS

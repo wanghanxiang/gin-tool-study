@@ -53,7 +53,7 @@ Golang V1.17
 
 - crypto
 
-- logrus
+- logrus    https://github.com/sirupsen/logrus
 
 - qiniu-go-sdk
 
@@ -63,6 +63,11 @@ Golang V1.17
  - using env:   export GIN_MODE=release
  - using code:  gin.SetMode(gin.ReleaseMode)
 
+
+
+
+
+### 三、随便记录
 
 删除.DS_Store文件
  find . -name .DS_Store -print0 | xargs -0 git rm -f --ignore-unmatch
