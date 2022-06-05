@@ -18,7 +18,11 @@ const (
 	ErrorNotExistAddress    = 10008
 	ErrorExistFavorite      = 10009
 
-	ErrorAuthToken = 30003
+	ErrorAuthCheckTokenFail        = 30001 //token 错误
+	ErrorAuthCheckTokenTimeout     = 30002 //token 过期
+	ErrorAuthToken                 = 30003
+	ErrorAuth                      = 30004
+	ErrorAuthInsufficientAuthority = 30005
 
 	//数据库错误
 	ErrorDatabase = 40001

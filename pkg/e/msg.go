@@ -17,7 +17,11 @@ var MsgFlags = map[int]string{
 	ErrorNotExistAddress:    "该收获地址不存在",
 	ErrorExistFavorite:      "已收藏该商品",
 
-	ErrorAuthToken: "Token错误",
+	ErrorAuthCheckTokenFail:        "Token鉴权失败",
+	ErrorAuthCheckTokenTimeout:     "Token已过期",
+	ErrorAuthToken:                 "Token生成失败",
+	ErrorAuth:                      "Token错误",
+	ErrorAuthInsufficientAuthority: "权限不足",
 
 	ErrorDatabase: "数据库操作出错,请重试",
 

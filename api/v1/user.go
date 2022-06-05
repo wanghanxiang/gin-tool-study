@@ -30,3 +30,16 @@ func UserLogin(c *gin.Context) {
 		util.LogrusObj.Infoln(err)
 	}
 }
+
+//更新用户信息
+func UserUpdate(c *gin.Context) {
+	var userUpdateService service.UserService
+	claims, _ := util.ParseToken(c.GetHeader("Cookie"))
+	if err := c.ShouldBind(&userUpdateService); err == nil {
+		res := userUpdateService.Update(claims.ID)
+		c.JSON(200, res)
+	} else {
+		c.JSON(400, ErrorResponse(err))
+		util.LogrusObj.Infoln(err)
+	}
+}

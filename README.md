@@ -41,7 +41,7 @@ Golang V1.17
 
 - gorm     gorm.io/gorm     github.com/jinzhu/gorm
 
-  gorm文档 https://gorm.io/zh_CN/docs/
+  gorm文档    https://gorm.io/zh_CN/docs/
 
 - mysql
 

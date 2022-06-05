@@ -50,8 +50,8 @@ func Init() {
 }
 
 func LoadServer(file *ini.File) {
-	RunMode = file.Section("service").Key("RunMode").String()
-	HttpPort = file.Section("service").Key("HttpPort").String()
+	RunMode = file.Section("server").Key("RunMode").String()
+	HttpPort = file.Section("server").Key("HttpPort").String()
 }
 
 func LoadMysqlData(file *ini.File) {

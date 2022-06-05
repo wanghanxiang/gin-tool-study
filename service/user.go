@@ -41,6 +41,7 @@ func (service UserService) Register() serializer.Response {
 			Data:   "密钥长度不足",
 		}
 	}
+	//密钥，支付密码
 	util.Encrypt.SetKey(service.Key)
 	model.DB.Model(&model.User{}).Where("user_name=?", service.UserName).Count(&count)
 	if count == 1 {
@@ -122,4 +123,42 @@ func (service UserService) Login() serializer.Response {
 		Data:   serializer.TokenData{User: serializer.BuildUser(user), Token: token},
 		Msg:    e.GetMsg(code),
 	}
+}
+
+func (service UserService) Update(id uint) serializer.Response {
+	var user model.User
+	code := e.SUCCESS
+	//https://gorm.io/zh_CN/docs/query.html
+	err := model.DB.Where("id", id).First(&user).Error
+	if err != nil {
+		logging.Info(err)
+		code = e.ErrorDatabase
+		return serializer.Response{
+			Status: code,
+			Msg:    e.GetMsg(code),
+			Error:  err.Error(),
+		}
+	}
+
+	if service.NickName != "" {
+		user.Nickname = service.NickName
+	}
+
+	err = model.DB.Save(&user).Error
+	if err != nil {
+		logging.Info(err)
+		code = e.ErrorDatabase
+		return serializer.Response{
+			Status: code,
+			Msg:    e.GetMsg(code),
+			Error:  err.Error(),
+		}
+	}
+
+	return serializer.Response{
+		Status: code,
+		Data:   serializer.BuildUser(user),
+		Msg:    e.GetMsg(code),
+	}
+
 }
