@@ -2,7 +2,7 @@
 
 ### 一、gin相关
 
-Gin-study-example
+参考学习项目: Gin-study-example
 
 https://github.com/EDDYCJY/go-gin-example
 
