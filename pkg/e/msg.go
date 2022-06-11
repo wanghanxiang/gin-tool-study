@@ -22,6 +22,7 @@ var MsgFlags = map[int]string{
 	ErrorAuthToken:                 "Token生成失败",
 	ErrorAuth:                      "Token错误",
 	ErrorAuthInsufficientAuthority: "权限不足",
+	ErrorSendEmail:                 "邮件发送失败",
 
 	ErrorDatabase: "数据库操作出错,请重试",
 

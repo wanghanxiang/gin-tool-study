@@ -11,6 +11,7 @@ require (
 	github.com/jinzhu/gorm v1.9.16
 	github.com/sirupsen/logrus v1.8.1
 	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e
+	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gopkg.in/ini.v1 v1.66.6
 	gopkg.in/yaml.v2 v2.4.0
 	gorm.io/driver/mysql v1.3.4
@@ -42,4 +43,5 @@ require (
 	golang.org/x/sys v0.0.0-20220408201424-a24fb2fb8a0f // indirect
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
+	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 )

@@ -43,3 +43,17 @@ func UserUpdate(c *gin.Context) {
 		util.LogrusObj.Infoln(err)
 	}
 }
+
+//发送邮件
+func SendEmail(c *gin.Context) {
+	var sendEmailService service.SendEmailService
+	//检查cookie里面的信息
+	claims, _ := util.ParseToken(c.GetHeader("Cookie"))
+	if err := c.ShouldBind(&sendEmailService); err == nil {
+		res := sendEmailService.SendEmail(claims.ID)
+		c.JSON(200, res)
+	} else {
+		c.JSON(400, ErrorResponse(err))
+		util.LogrusObj.Infoln(err)
+	}
+}

@@ -23,6 +23,7 @@ const (
 	ErrorAuthToken                 = 30003
 	ErrorAuth                      = 30004
 	ErrorAuthInsufficientAuthority = 30005
+	ErrorSendEmail                 = 30007
 
 	//数据库错误
 	ErrorDatabase = 40001

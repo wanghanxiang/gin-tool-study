@@ -71,3 +71,16 @@ Golang V1.17
 
 删除.DS_Store文件
  find . -name .DS_Store -print0 | xargs -0 git rm -f --ignore-unmatch
+
+
+ QQ 邮箱
+POP3 服务器地址：qq.com（端口：995）
+SMTP 服务器地址：smtp.qq.com（端口：465/587）
+
+163 邮箱：
+POP3 服务器地址：pop.163.com（端口：110）
+SMTP 服务器地址：smtp.163.com（端口：25）
+
+126 邮箱：
+POP3 服务器地址：pop.126.com（端口：110）
+SMTP 服务器地址：smtp.126.com（端口：25）

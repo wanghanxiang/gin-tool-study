@@ -31,6 +31,7 @@ func NewRouter() *gin.Engine {
 		authed.Use(middleware.JWT())
 		{
 			authed.PUT("user", api.UserUpdate)
+			authed.POST("user/sending-email", api.SendEmail)
 		}
 
 	}

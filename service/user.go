@@ -1,17 +1,27 @@
 package service
 
 import (
+	"gin-tool-study/conf"
 	"gin-tool-study/model"
 	"gin-tool-study/pkg/e"
 	util "gin-tool-study/pkg/utils"
 	"gin-tool-study/serializer"
+	"strings"
 	"time"
 
 	"github.com/jinzhu/gorm"
 	logging "github.com/sirupsen/logrus"
+	"gopkg.in/gomail.v2"
 )
 
 //UserRegisterService 管理用户注册服务
+/**
+用户注册
+用户登录
+修改用户名字
+绑定邮箱
+验证邮箱
+*/
 type UserService struct {
 	NickName string `form:"nick_name" json:"nick_name"`
 	UserName string `form:"user_name" json:"user_name"`
@@ -103,6 +113,7 @@ func (service UserService) Login() serializer.Response {
 			Msg:    e.GetMsg(code),
 		}
 	}
+
 	if user.CheckPassword(service.Password) == false {
 		code = e.ErrorNotCompare
 		return serializer.Response{
@@ -110,6 +121,7 @@ func (service UserService) Login() serializer.Response {
 			Msg:    e.GetMsg(code),
 		}
 	}
+
 	token, err := util.GenerateToken(user.ID, service.UserName, 0)
 	if err != nil {
 		logging.Info(err)
@@ -164,6 +176,7 @@ func (service UserService) Update(id uint) serializer.Response {
 
 }
 
+//检查email中的token
 func (service UserService) Valid_token(token string) serializer.Response {
 	var userID uint
 	var email string
@@ -270,6 +283,61 @@ func (service UserService) Valid_token(token string) serializer.Response {
 		Status: code,
 		Msg:    e.GetMsg(code),
 		Data:   serializer.BuildUser(user),
+	}
+
+}
+
+//发送邮件的接口, 方法传入id为用户信息的id
+func (service SendEmailService) SendEmail(id uint) serializer.Response {
+	code := e.SUCCESS
+	var noticeMsg model.Notice
+	var emailAddress string
+
+	token, err := util.GenerateEmailToken(id, service.OperationType, service.Password, service.Email)
+	if err != nil {
+		logging.Info(err)
+		code = e.ErrorAuthToken
+		return serializer.Response{
+			Status: code,
+			Msg:    e.GetMsg(code),
+		}
+	}
+	//获取对应的邮件提醒的数据
+	if err := model.DB.First(&noticeMsg, service.OperationType).Error; err != nil {
+		logging.Info(err)
+		code = e.ErrorDatabase
+		return serializer.Response{
+			Status: code,
+			Msg:    e.GetMsg(code),
+		}
+	}
+
+	//替换邮件内容,准备发送邮件
+	//服务验证email的地址 + token
+	emailAddress = conf.ValidEmail + token
+	mailTitle := noticeMsg.Text
+	mailText := strings.Replace(mailTitle, "Email", emailAddress, -1)
+
+	//发送邮件
+	m := gomail.NewMessage()
+	m.SetHeader("From", conf.SmtpEmail)
+	m.SetHeader("To", service.Email)
+	m.SetHeader("Subject", "Gin-tool") //邮件标题
+	m.SetBody("text/html", mailText)   //邮件内容
+	//m.Attach("E:\\IMGP0814.JPG")   //邮件附件
+	d := gomail.NewDialer(conf.SmtpHost, 465, conf.SmtpEmail, conf.SmtpPass)
+
+	if err := d.DialAndSend(m); err != nil {
+		logging.Info(err)
+		code = e.ErrorSendEmail
+		return serializer.Response{
+			Status: code,
+			Msg:    e.GetMsg(code),
+		}
+	}
+	return serializer.Response{
+		Status: code,
+		Msg:    e.GetMsg(code),
 	}
 
 }
