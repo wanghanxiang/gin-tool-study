@@ -39,6 +39,7 @@ func Init() {
 	LoadServer(file)
 	LoadMysqlData(file)
 	LoadEmail(file)
+	LoadQinNiu(file)
 	if err := LoadLocales("conf/locales/zh-cn.yaml"); err != nil {
 		logging.Info(err) //日志内容
 		panic(err)
@@ -68,4 +69,11 @@ func LoadEmail(file *ini.File) {
 	SmtpHost = file.Section("email").Key("SmtpHost").String()
 	SmtpEmail = file.Section("email").Key("SmtpEmail").String()
 	SmtpPass = file.Section("email").Key("SmtpPass").String()
+}
+
+func LoadQinNiu(file *ini.File) {
+	AccessKey = file.Section("qiniu").Key("AccessKey").String()
+	SerectKey = file.Section("qiniu").Key("SerectKey").String()
+	Bucket = file.Section("qiniu").Key("Bucket").String()
+	QiniuServer = file.Section("qiniu").Key("QiniuServer").String()
 }

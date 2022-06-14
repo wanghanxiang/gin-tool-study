@@ -20,7 +20,7 @@ var (
 
 // Redis 在中间件中初始化redis链接  防止循环导包，所以放在这里
 func init() {
-	file, err := ini.Load("../conf/config.ini")
+	file, err := ini.Load("./conf/app.ini")
 	if err != nil {
 		fmt.Println("配置文件读取错误，请检查文件路径:", err)
 	}

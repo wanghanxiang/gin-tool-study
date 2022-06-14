@@ -30,8 +30,12 @@ func NewRouter() *gin.Engine {
 		authed := v1.Group("/")
 		authed.Use(middleware.JWT())
 		{
+			//用户操作
 			authed.PUT("user", api.UserUpdate)
 			authed.POST("user/sending-email", api.SendEmail)
+
+			// 商品操作
+			authed.POST("product", api.CreateProduct)
 		}
 
 	}
