@@ -28,6 +28,9 @@ type ProductService struct {
 	PageSize      int    `form:"pageSize"`
 }
 
+type ListProductImgService struct {
+}
+
 //创建商品
 func (service *ProductService) Create(id uint, files []*multipart.FileHeader) serializer.Response {
 	code := e.SUCCESS
@@ -85,6 +88,7 @@ func (service *ProductService) Create(id uint, files []*multipart.FileHeader) se
 				Error:  info,
 			}
 		}
+		// 每一项图片都存在数据库里面
 		productImg := model.ProductImg{
 			ProductID: product.ID,
 			ImgPath:   info,
@@ -105,4 +109,159 @@ func (service *ProductService) Create(id uint, files []*multipart.FileHeader) se
 		Msg:    e.GetMsg(code),
 	}
 
+}
+
+//List接口
+func (service *ProductService) List() serializer.Response {
+	var products []model.Product
+	var total int64
+	code := e.SUCCESS
+	if service.PageSize == 0 {
+		service.PageSize = 20
+	}
+	//如果传入的商品的CategoryID为0的话
+	if service.CategoryID == 0 {
+		if err := model.DB.Model(model.Product{}).Count(&total).Error; err != nil {
+			logging.Info(err)
+			code = e.ErrorDatabase
+			return serializer.Response{
+				Status: code,
+				Msg:    e.GetMsg(code),
+				Error:  err.Error(),
+			}
+		}
+		if err := model.DB.Offset((service.PageNum - 1) * service.PageSize).
+			Limit(service.PageSize).Find(&products).
+			Error; err != nil {
+			logging.Info(err)
+			code = e.ErrorDatabase
+			return serializer.Response{
+				Status: code,
+				Msg:    e.GetMsg(code),
+				Error:  err.Error(),
+			}
+		}
+
+	} else {
+		//Preload 预处理用来处理一对多关系的
+		if err := model.DB.Model(model.Product{}).Preload("Category").
+			Where("category_id = ?", service.CategoryID).
+			Count(&total).Error; err != nil {
+			logging.Info(err)
+			code = e.ErrorDatabase
+			return serializer.Response{
+				Status: code,
+				Msg:    e.GetMsg(code),
+				Error:  err.Error(),
+			}
+		}
+
+		if err := model.DB.Model(model.Product{}).Preload("Category").
+			Where("category_id=?", service.CategoryID).
+			Offset((service.PageNum - 1) * service.PageSize).
+			Limit(service.PageSize).
+			Find(&products).Error; err != nil {
+			logging.Info(err)
+			code = e.ErrorDatabase
+			return serializer.Response{
+				Status: code,
+				Msg:    e.GetMsg(code),
+				Error:  err.Error(),
+			}
+		}
+
+	}
+
+	return serializer.BuildListResponse(serializer.BuildProducts(products), uint(total))
+}
+
+//删除商品
+func (service *ProductService) Delete(id string) serializer.Response {
+	code := e.SUCCESS
+	var product model.Product
+	//判断商品是否存在
+	if err := model.DB.First(&product, id).Error; err != nil {
+		logging.Info(err)
+		code = e.ErrorDatabase
+		return serializer.Response{
+			Status: code,
+			Msg:    e.GetMsg(code),
+			Error:  err.Error(),
+		}
+	}
+	//存在则删除商品
+	if err := model.DB.Delete(&product).Error; err != nil {
+		logging.Info(err)
+		code = e.ErrorDatabase
+		return serializer.Response{
+			Status: code,
+			Msg:    e.GetMsg(code),
+			Error:  err.Error(),
+		}
+
+	}
+	return serializer.Response{
+		Status: code,
+		Msg:    e.GetMsg(code),
+	}
+
+}
+
+//更新商品
+func (service *ProductService) Update(id string) serializer.Response {
+	var product model.Product
+	model.DB.Model(&model.Product{}).First(&product, id)
+	product.Name = service.Name
+	product.CategoryID = uint(service.CategoryID)
+	product.Title = service.Title
+	product.Info = service.Info
+	product.ImgPath = service.ImgPath
+	product.Price = service.Price
+	product.DiscountPrice = service.DiscountPrice
+	product.OnSale = service.OnSale
+	code := e.SUCCESS
+
+	if err := model.DB.Save(&product).Error; err != nil {
+		logging.Info(err)
+		code = e.ErrorDatabase
+		return serializer.Response{
+			Status: code,
+			Msg:    e.GetMsg(code),
+			Error:  err.Error(),
+		}
+	}
+	return serializer.Response{
+		Status: code,
+		Msg:    e.GetMsg(code),
+	}
+
+}
+
+//搜索商品
+func (service *ProductService) Search() serializer.Response {
+	var products []model.Product
+	code := e.SUCCESS
+	if service.PageSize == 0 {
+		service.PageSize = 15
+	}
+	err := model.DB.Where("name LIKE ? OR info LIKE ?", "%"+service.Info+"%", "%"+service.Info+"%").
+		Offset((service.PageNum - 1) * service.PageSize).
+		Limit(service.PageSize).Find(&products).Error
+	if err != nil {
+		logging.Info(err)
+		code = e.ErrorDatabase
+		return serializer.Response{
+			Status: code,
+			Msg:    e.GetMsg(code),
+			Error:  err.Error(),
+		}
+	}
+	return serializer.BuildListResponse(serializer.BuildProducts(products), uint(len(products)))
+}
+
+//获取商品列表图片
+func (service *ListProductImgService) List(id string) serializer.Response {
+	var productImgList []model.ProductImg
+	model.DB.Model(model.ProductImg{}).Where("product_id=?", id).Find(&productImgList)
+	return serializer.BuildListResponse(serializer.BuildProductImgs(productImgList), uint(len(productImgList)))
 }
