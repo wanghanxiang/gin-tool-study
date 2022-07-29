@@ -37,11 +37,15 @@ type reqObj struct {
 //初始请求参数
 func (p *ReqParams) InitRequest() (req Curl, err error) {
 	var reqParams *bytes.Reader
+	obj := new(reqObj)
+
 	if p.Params != nil {
 		reqParams = bytes.NewReader(p.Params)
+		obj.req, err = http.NewRequest(p.Method, p.Url, reqParams)
+	} else {
+		obj.req, err = http.NewRequest(p.Method, p.Url, nil)
 	}
-	obj := new(reqObj)
-	obj.req, err = http.NewRequest(p.Method, p.Url, reqParams)
+
 	if err != nil {
 		return nil, err
 	}
@@ -86,3 +90,23 @@ func (obj *reqObj) Do() ([]byte, error) {
 	}
 	return body, nil
 }
+
+// func main() {
+// 	// params := map[string]string{
+// 	// 	"wd": "测试数据",
+// 	// }
+// 	// body, _ := json.Marshal(params)
+// 	reqParam := &ReqParams{
+// 		Url:    "http://localhost:3000/api/test",
+// 		Method: "GET",
+// 		Header: "json",
+// 		//Params: body,
+// 	}
+// 	req, err := reqParam.InitRequest()
+// 	if err != nil {
+// 		fmt.Println("request err", err)
+// 		return
+// 	}
+// 	byteData, _ := req.Do()
+// 	fmt.Println(string(byteData))
+// }
