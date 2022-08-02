@@ -3,7 +3,6 @@ module gin-tool-study
 go 1.17
 
 require (
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-contrib/sessions v0.0.5
 	github.com/gin-gonic/gin v1.8.0
 	github.com/go-playground/validator/v10 v10.10.0
@@ -11,6 +10,7 @@ require (
 	github.com/jinzhu/gorm v1.9.16
 	github.com/qiniu/go-sdk/v7 v7.13.0
 	github.com/sirupsen/logrus v1.8.1
+	github.com/stretchr/testify v1.7.1
 	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gopkg.in/ini.v1 v1.66.6
@@ -18,6 +18,12 @@ require (
 	gorm.io/driver/mysql v1.3.4
 	gorm.io/gorm v1.23.4
 	gorm.io/plugin/dbresolver v1.2.0
+)
+
+require (
+	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
+	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 )
 
 require (
@@ -39,6 +45,7 @@ require (
 	github.com/onsi/ginkgo v1.16.5 // indirect
 	github.com/onsi/gomega v1.19.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.1 // indirect
+	github.com/robfig/cron/v3 v3.0.1
 	github.com/ugorji/go/codec v1.2.7 // indirect
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f // indirect
 	golang.org/x/sync v0.0.0-20201207232520-09787c993a3a // indirect

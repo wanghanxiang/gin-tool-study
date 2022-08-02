@@ -162,3 +162,7 @@ gintool                                      latest                    4243757a1
  docker run -p 3000:3000 gintool:multistage
 ```
 
+
+
+把github.com/dgrijalva/jwt-go 替换为github.com/golang-jwt/jwt/v4
+jwt-go是个人开发者的一个Go语言的JWT实现。jwt-go 4.0.0-preview1之前版本存在安全漏洞。攻击者可利用该漏洞在使用[]string{} for m[\"aud\"](规范允许)的情况下绕过预期的访问限制
