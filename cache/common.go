@@ -3,50 +3,74 @@ package cache
 import (
 	"fmt"
 	"strconv"
+	"sync"
+	"time"
 
 	"github.com/go-redis/redis"
-	logging "github.com/sirupsen/logrus"
-	"gopkg.in/ini.v1"
 )
+
+// 定义 MyRedis 结构体
+type MyRedis struct {
+	Client *redis.Client
+}
+
+// 使用单例模式进行封装
+var once sync.Once
 
 // RedisClient Redis缓存客户端单例
-var (
-	RedisClient *redis.Client
-	RedisDb     string
-	RedisAddr   string
-	RedisPw     string
-	RedisDbName string
-)
+var RedisClient *MyRedis = new(MyRedis)
 
-// Redis 在中间件中初始化redis链接  防止循环导包，所以放在这里
-func init() {
-	file, err := ini.Load("./conf/app.ini")
-	if err != nil {
-		fmt.Println("配置文件读取错误，请检查文件路径:", err)
-	}
-	LoadRedisData(file)
-	Redis()
+// 封装 redis 实例，提供获取
+func GetInstance() *MyRedis {
+	return RedisClient
 }
 
-//Redis 在中间件中初始化redis链接
-func Redis() {
+func NewRedis(RedisAddr string, RedisDbName string, RedisPw string) *redis.Client {
 	db, _ := strconv.ParseUint(RedisDbName, 10, 64)
-	client := redis.NewClient(&redis.Options{
+	myRedis := redis.NewClient(&redis.Options{
 		Addr: RedisAddr,
-		//Password: conf.RedisPw,
+		//Password: "",
 		DB: int(db),
 	})
-	_, err := client.Ping().Result()
+	_, err := myRedis.Ping().Result()
 	if err != nil {
-		logging.Info(err)
+		fmt.Println(err)
 		panic(err)
 	}
-	RedisClient = client
+	fmt.Println("redis已经连接")
+
+	once.Do(func() {
+		RedisClient.Client = myRedis
+	})
+
+	return myRedis
 }
 
-func LoadRedisData(file *ini.File) {
-	RedisDb = file.Section("redis").Key("RedisDb").String()
-	RedisAddr = file.Section("redis").Key("RedisAddr").String()
-	RedisPw = file.Section("redis").Key("RedisPw").String()
-	RedisDbName = file.Section("redis").Key("RedisDbName").String()
+func (mr *MyRedis) Set(key string, value interface{}, ttl time.Duration) {
+	mr.Client.Set(key, value, ttl)
 }
+func (mr MyRedis) Get(key string) *redis.StringCmd {
+	return mr.Client.Get(key)
+}
+
+func (mr MyRedis) Incr(key string) interface{} {
+	return mr.Client.Incr(key)
+}
+
+func (mr MyRedis) ZIncrBy(key string, increment float64, member string) interface{} {
+	return mr.Client.ZIncrBy(key, increment, member)
+}
+
+// func main() {
+// 	// 项目启动时初始化 redis
+// 	NewRedis("localhost", "")
+// 	fmt.Println("redis 连接成功")
+// }
+
+// package user
+// func getUser() {
+//     result := cache.GetInstance().Exist("user_001")
+//     if !result {
+//         fmt.Println("不存在该数据")
+//     }
+// }

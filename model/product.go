@@ -26,7 +26,7 @@ type Product struct {
 
 // 获取点击数
 func (product *Product) GetView() uint64 {
-	countStr, _ := cache.RedisClient.Get(cache.GetViewKey(product.ID)).Result()
+	countStr, _ := cache.GetInstance().Get(cache.GetViewKey(product.ID)).Result()
 	count, _ := strconv.ParseUint(countStr, 10, 64)
 	return count
 }
@@ -34,19 +34,19 @@ func (product *Product) GetView() uint64 {
 //增加浏览量
 func (product *Product) AddView() {
 	// 增加视频点击数
-	cache.RedisClient.Incr(cache.GetViewKey(product.ID))
+	cache.GetInstance().Incr(cache.GetViewKey(product.ID))
 	// 增加排行点击数
-	cache.RedisClient.ZIncrBy(cache.RankKey, 1, strconv.Itoa(int(product.ID)))
+	cache.GetInstance().ZIncrBy(cache.RankKey, 1, strconv.Itoa(int(product.ID)))
 }
 
 // AddBookRank 图书排名
 func (product *Product) AddBookRank() {
 	//增加图书榜的点击量
-	cache.RedisClient.ZIncrBy(cache.BookRank, 1, strconv.Itoa(int(product.ID)))
+	cache.GetInstance().ZIncrBy(cache.BookRank, 1, strconv.Itoa(int(product.ID)))
 }
 
 // AddCameraRank 相机排行榜
 func (product *Product) AddCameraRank() {
 	// 增加配件排行点击数
-	cache.RedisClient.ZIncrBy(cache.CameraRank, 1, strconv.Itoa(int(product.ID)))
+	cache.GetInstance().ZIncrBy(cache.CameraRank, 1, strconv.Itoa(int(product.ID)))
 }
