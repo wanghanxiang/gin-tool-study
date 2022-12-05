@@ -1,0 +1,182 @@
+package service
+
+import (
+	"gin-tool-study/model"
+	"gin-tool-study/pkg/e"
+	util "gin-tool-study/pkg/utils"
+	"gin-tool-study/serializer"
+	"strconv"
+)
+
+//购物车 解析form使用的
+type CartService struct {
+	CreateUserID uint `form:"create_user_id" json:"create_user_id"` //商品的创建人的id 后续应该升级为shopId
+	Num          uint `from:"num" json:"num"`
+}
+
+//创建购物车
+// 1、获取产品信息
+// 2、根据产品信息 创建购物车信息 产品数量创建时时间等
+// 3、已经在购物车的信息 添加的时候加一 不存在的时候创建
+// id 商品id uid 用户id
+func (service *CartService) Create(id string, uid uint) serializer.Response {
+	var product model.Product
+	code := e.SUCCESS
+	if err := model.DB.First(&product, id).Error; err != nil {
+		//商品信息不存在也包含在里面
+		util.LogrusObj.Infoln(err)
+		code = e.ErrorDatabase
+		return serializer.Response{
+			Status: code,
+			Msg:    e.GetMsg(code),
+			Error:  err.Error(),
+		}
+	}
+
+	cartId, _ := strconv.Atoi(id)
+	var cart model.Cart
+	model.DB.Where("user_id=? AND product_id=? AND product_create_user_id=?", uid, id, product.CreateUserID).First(&cart)
+	if cart == (model.Cart{}) {
+		//不存在购物车信息则创建
+		cart = model.Cart{
+			UserID:              uid,
+			ProductID:           uint(cartId),
+			ProductCreateUserID: uint(product.CreateUserID),
+			Num:                 1,
+			MaxNum:              10,
+			Check:               false,
+		}
+		err := model.DB.Create(&cart).Error
+		if err != nil {
+			util.LogrusObj.Infoln(err)
+			code = e.ErrorDatabase
+			return serializer.Response{
+				Status: code,
+				Msg:    e.GetMsg(code),
+				Error:  err.Error(),
+			}
+		}
+
+		return serializer.Response{
+			Status: code,
+			Data:   serializer.BuildCart(cart, product, service.CreateUserID),
+			Msg:    e.GetMsg(code),
+		}
+
+	} else if cart.Num < cart.MaxNum {
+		cart.Num++
+		err := model.DB.Save(&cart).Error
+		if err != nil {
+			util.LogrusObj.Infoln(err)
+			return serializer.Response{
+				Status: code,
+				Msg:    e.GetMsg(code),
+				Error:  err.Error(),
+			}
+		}
+		return serializer.Response{
+			Status: 201,
+			Msg:    "商品已经在购物车了，数量+1",
+			Data:   serializer.BuildCart(cart, product, service.CreateUserID),
+		}
+
+	} else {
+		//超过最大的商品数量
+		return serializer.Response{
+			Status: 202,
+			Msg:    "超过购物车添加的最大上限",
+		}
+	}
+}
+
+//更新购物车信息
+//id 购物车的id
+func (service *CartService) Update(id string) serializer.Response {
+	var cart model.Cart
+	code := e.SUCCESS
+	err := model.DB.Where("id=?", id).Find(&cart).Error
+	if err != nil {
+		util.LogrusObj.Infoln(err)
+		code := e.ErrorDatabase
+		return serializer.Response{
+			Status: code,
+			Msg:    e.GetMsg(code),
+			Error:  err.Error(),
+		}
+	}
+
+	//更新数量
+	cart.Num = service.Num
+	err = model.DB.Save(&cart).Error
+	if err != nil {
+		util.LogrusObj.Infoln(err)
+		code := e.ErrorDatabase
+		return serializer.Response{
+			Status: code,
+			Msg:    e.GetMsg(code),
+			Error:  err.Error(),
+		}
+	}
+
+	return serializer.Response{
+		Status: code,
+		Msg:    e.GetMsg(code),
+	}
+
+}
+
+//删除购物车信息
+func (service *CartService) Delete(pid string, uid uint) serializer.Response {
+	var cart model.Cart
+	code := e.SUCCESS
+	err := model.DB.Where("user_id=? AND product_id=?", uid, pid).Error
+	if err != nil {
+		util.LogrusObj.Infoln(err)
+		code := e.ErrorDatabase
+		return serializer.Response{
+			Status: code,
+			Msg:    e.GetMsg(code),
+			Error:  err.Error(),
+		}
+	}
+	err = model.DB.Delete(&cart).Error
+	if err != nil {
+		util.LogrusObj.Infoln(err)
+		code := e.ErrorDatabase
+		return serializer.Response{
+			Status: code,
+			Msg:    e.GetMsg(code),
+			Error:  err.Error(),
+		}
+	}
+	return serializer.Response{
+		Status: code,
+		Msg:    e.GetMsg(code),
+	}
+
+}
+
+//获取列表
+//用户id
+func (service *CartService) List(userId string) serializer.Response {
+	var carts []model.Cart
+	code := e.SUCCESS
+	err := model.DB.Where("user_id=?", userId).Find(&carts).Error
+
+	util.LogrusObj.Infoln("1111")
+	if err != nil {
+		util.LogrusObj.Infoln(err)
+		code := e.ErrorDatabase
+		return serializer.Response{
+			Status: code,
+			Msg:    e.GetMsg(code),
+			Error:  err.Error(),
+		}
+	}
+	return serializer.Response{
+		Status: code,
+		Data:   serializer.BuildCarts(carts),
+		Msg:    e.GetMsg(code),
+	}
+
+}

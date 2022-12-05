@@ -19,9 +19,9 @@ type Product struct {
 	DiscountPrice    string
 	OnSale           bool `gorm:"default:false"`
 	Num              int
-	CreateUserID     int
-	CreateUserName   string
-	CreateUserAvatar string
+	CreateUserID     int    //创建用户的Id
+	CreateUserName   string // 创建用户的名字
+	CreateUserAvatar string //创建用户的图像信息
 }
 
 // 获取点击数

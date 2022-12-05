@@ -34,8 +34,13 @@ func NewRouter() *gin.Engine {
 			authed.PUT("user", api.UserUpdate)
 			authed.POST("user/sending-email", api.SendEmail)
 
-			// 商品操作
+			//商品操作
 			authed.POST("product", api.CreateProduct)
+			//购物车
+			authed.POST("carts/:id", api.CreateCart) // 产品id
+			authed.GET("carts/:id", api.ShowList)    // 用户的id
+			authed.PUT("carts/:id", api.UpdateCart)  // 购物车id
+			authed.DELETE("carts/:id", api.DeleteCart)
 		}
 
 	}

@@ -11,7 +11,8 @@ func migration() {
 		AutoMigrate(&User{},
 			&Notice{},
 			&Product{},
-			&ProductImg{})
+			&ProductImg{},
+			&Cart{})
 	if err != nil {
 		fmt.Println("register table fail")
 		os.Exit(0)
