@@ -1,6 +1,6 @@
 package serializer
 
-import "gin-tool-study/model"
+import "product-mall/model"
 
 type Address struct {
 	ID       uint   `json:"id"`

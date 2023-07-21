@@ -1,4 +1,4 @@
-# gin-tool-study
+# product-mall
 
 ### 一、gin相关
 
@@ -136,7 +136,7 @@ amd64
 所以在本文的多阶段构建 Dockerfile.multistage 中，构建命令是：
 
 ```
-CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /gin-tool-study
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /product-mall
 ```
 
 由于我们现在有两个 Dockerfile，所以我们必须告诉 Docker 我们要使用新的 Dockerfile 进行构建。

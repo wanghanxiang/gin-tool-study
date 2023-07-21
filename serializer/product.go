@@ -1,7 +1,7 @@
 package serializer
 
 import (
-	"gin-tool-study/model"
+	"product-mall/model"
 )
 
 type Product struct {

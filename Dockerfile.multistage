@@ -11,7 +11,7 @@ COPY . ./
 RUN go env -w GOPROXY=https://goproxy.cn,direct \
     && go mod download
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o /gin-tool-study
+RUN CGO_ENABLED=0 GOOS=linux go build -o /product-mall
 
 ##
 ## Deploy
@@ -20,11 +20,11 @@ FROM scratch
 
 WORKDIR /app
 
-COPY --from=build /gin-tool-study ../gin-tool-study
+COPY --from=build /product-mall ../product-mall
 # 主要是把配置文件啥的拷贝过来
 COPY --from=build /app ./
 
 
 EXPOSE 3000
 
-ENTRYPOINT ["/gin-tool-study"]
+ENTRYPOINT ["/product-mall"]

@@ -1,10 +1,10 @@
 package service
 
 import (
-	"gin-tool-study/model"
-	"gin-tool-study/pkg/e"
-	"gin-tool-study/serializer"
 	"mime/multipart"
+	"product-mall/model"
+	"product-mall/pkg/e"
+	"product-mall/serializer"
 
 	logging "github.com/sirupsen/logrus"
 )

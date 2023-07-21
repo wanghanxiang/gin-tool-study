@@ -1,6 +1,6 @@
 package serializer
 
-import "gin-tool-study/model"
+import "product-mall/model"
 
 //购物车
 type Cart struct {

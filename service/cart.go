@@ -1,10 +1,10 @@
 package service
 
 import (
-	"gin-tool-study/model"
-	"gin-tool-study/pkg/e"
-	util "gin-tool-study/pkg/utils"
-	"gin-tool-study/serializer"
+	"product-mall/model"
+	"product-mall/pkg/e"
+	util "product-mall/pkg/tools"
+	"product-mall/serializer"
 	"strconv"
 )
 

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"gin-tool-study/conf"
-	"gin-tool-study/routes"
+	"product-mall/conf"
+	"product-mall/routes"
 )
 
 func main() {

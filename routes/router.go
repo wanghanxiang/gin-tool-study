@@ -1,8 +1,8 @@
 package routes
 
 import (
-	api "gin-tool-study/api/v1"
-	"gin-tool-study/middleware"
+	api "product-mall/api/v1"
+	"product-mall/middleware"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"

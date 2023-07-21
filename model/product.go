@@ -1,7 +1,7 @@
 package model
 
 import (
-	"gin-tool-study/cache"
+	"product-mall/cache"
 	"strconv"
 
 	"github.com/jinzhu/gorm"

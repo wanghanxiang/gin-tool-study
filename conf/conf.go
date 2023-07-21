@@ -2,8 +2,8 @@ package conf
 
 import (
 	"fmt"
-	"gin-tool-study/cache"
-	"gin-tool-study/model"
+	"product-mall/cache"
+	"product-mall/model"
 
 	"os"
 	"strings"

@@ -1,4 +1,4 @@
-module gin-tool-study
+module product-mall
 
 go 1.17
 

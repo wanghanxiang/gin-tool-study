@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"gin-tool-study/pkg/e"
-	util "gin-tool-study/pkg/utils"
+	"product-mall/pkg/e"
+	util "product-mall/pkg/tools"
 	"time"
 
 	"github.com/gin-gonic/gin"

@@ -3,8 +3,8 @@ package v1
 import (
 	"encoding/json"
 	"fmt"
-	"gin-tool-study/conf"
-	"gin-tool-study/serializer"
+	"product-mall/conf"
+	"product-mall/serializer"
 
 	"github.com/go-playground/validator/v10"
 )

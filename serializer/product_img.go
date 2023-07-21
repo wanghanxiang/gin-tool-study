@@ -1,6 +1,6 @@
 package serializer
 
-import "gin-tool-study/model"
+import "product-mall/model"
 
 type ProductImg struct {
 	ProductID uint   `json:"product_id" form:"product_id"`

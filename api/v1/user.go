@@ -1,8 +1,8 @@
 package v1
 
 import (
-	util "gin-tool-study/pkg/utils"
-	"gin-tool-study/service"
+	util "product-mall/pkg/tools"
+	"product-mall/service"
 
 	"github.com/gin-gonic/gin"
 )

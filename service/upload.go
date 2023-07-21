@@ -2,9 +2,9 @@ package service
 
 import (
 	"context"
-	"gin-tool-study/conf"
-	"gin-tool-study/pkg/e"
 	"mime/multipart"
+	"product-mall/conf"
+	"product-mall/pkg/e"
 
 	"github.com/qiniu/go-sdk/v7/auth/qbox"
 	"github.com/qiniu/go-sdk/v7/storage"
