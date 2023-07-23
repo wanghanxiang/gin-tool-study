@@ -1,6 +1,6 @@
-package serializer
+package dto
 
-import "product-mall/model"
+import "product-mall/internal/model"
 
 type ProductImg struct {
 	ProductID uint   `json:"product_id" form:"product_id"`

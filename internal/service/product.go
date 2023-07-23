@@ -2,9 +2,9 @@ package service
 
 import (
 	"mime/multipart"
-	"product-mall/model"
+	"product-mall/dto"
+	"product-mall/internal/model"
 	"product-mall/pkg/e"
-	"product-mall/serializer"
 
 	logging "github.com/sirupsen/logrus"
 )
@@ -32,13 +32,13 @@ type ListProductImgService struct {
 }
 
 //创建商品
-func (service *ProductService) Create(id uint, files []*multipart.FileHeader) serializer.Response {
+func (service *ProductService) Create(id uint, files []*multipart.FileHeader) dto.Response {
 	code := e.SUCCESS
 	//获取用户信息
 	var user model.User
 	if err := model.DB.Model(&model.User{}).Where("id = ?", id).First(&user).Error; err != nil {
 		code = e.ErrorExistUser
-		return serializer.Response{
+		return dto.Response{
 			Status: code,
 			Data:   e.GetMsg(code),
 		}
@@ -46,7 +46,7 @@ func (service *ProductService) Create(id uint, files []*multipart.FileHeader) se
 	tmp, _ := files[0].Open()
 	status, info := Upload2QiNiu(tmp, files[0].Size)
 	if status != 200 {
-		return serializer.Response{
+		return dto.Response{
 			Status: status,
 			Data:   e.GetMsg(status),
 			Error:  info,
@@ -71,7 +71,7 @@ func (service *ProductService) Create(id uint, files []*multipart.FileHeader) se
 	if err != nil {
 		logging.Info(err)
 		code = e.ErrorDatabase
-		return serializer.Response{
+		return dto.Response{
 			Status: code,
 			Msg:    e.GetMsg(code),
 			Error:  err.Error(),
@@ -82,7 +82,7 @@ func (service *ProductService) Create(id uint, files []*multipart.FileHeader) se
 		tmp, _ := file.Open()
 		status, info := Upload2QiNiu(tmp, file.Size)
 		if status != 200 {
-			return serializer.Response{
+			return dto.Response{
 				Status: status,
 				Data:   e.GetMsg(status),
 				Error:  info,
@@ -96,23 +96,23 @@ func (service *ProductService) Create(id uint, files []*multipart.FileHeader) se
 		err = model.DB.Create(&productImg).Error
 		if err != nil {
 			code = e.ERROR
-			return serializer.Response{
+			return dto.Response{
 				Status: code,
 				Msg:    e.GetMsg(code),
 				Error:  err.Error(),
 			}
 		}
 	}
-	return serializer.Response{
+	return dto.Response{
 		Status: code,
-		Data:   serializer.BuildProduct(product),
+		Data:   dto.BuildProduct(product),
 		Msg:    e.GetMsg(code),
 	}
 
 }
 
 //List接口
-func (service *ProductService) List() serializer.Response {
+func (service *ProductService) List() dto.Response {
 	var products []model.Product
 	var total int64
 	code := e.SUCCESS
@@ -124,7 +124,7 @@ func (service *ProductService) List() serializer.Response {
 		if err := model.DB.Model(model.Product{}).Count(&total).Error; err != nil {
 			logging.Info(err)
 			code = e.ErrorDatabase
-			return serializer.Response{
+			return dto.Response{
 				Status: code,
 				Msg:    e.GetMsg(code),
 				Error:  err.Error(),
@@ -135,7 +135,7 @@ func (service *ProductService) List() serializer.Response {
 			Error; err != nil {
 			logging.Info(err)
 			code = e.ErrorDatabase
-			return serializer.Response{
+			return dto.Response{
 				Status: code,
 				Msg:    e.GetMsg(code),
 				Error:  err.Error(),
@@ -149,7 +149,7 @@ func (service *ProductService) List() serializer.Response {
 			Count(&total).Error; err != nil {
 			logging.Info(err)
 			code = e.ErrorDatabase
-			return serializer.Response{
+			return dto.Response{
 				Status: code,
 				Msg:    e.GetMsg(code),
 				Error:  err.Error(),
@@ -163,7 +163,7 @@ func (service *ProductService) List() serializer.Response {
 			Find(&products).Error; err != nil {
 			logging.Info(err)
 			code = e.ErrorDatabase
-			return serializer.Response{
+			return dto.Response{
 				Status: code,
 				Msg:    e.GetMsg(code),
 				Error:  err.Error(),
@@ -172,18 +172,18 @@ func (service *ProductService) List() serializer.Response {
 
 	}
 
-	return serializer.BuildListResponse(serializer.BuildProducts(products), uint(total))
+	return dto.BuildListResponse(dto.BuildProducts(products), uint(total))
 }
 
 //删除商品
-func (service *ProductService) Delete(id string) serializer.Response {
+func (service *ProductService) Delete(id string) dto.Response {
 	code := e.SUCCESS
 	var product model.Product
 	//判断商品是否存在
 	if err := model.DB.First(&product, id).Error; err != nil {
 		logging.Info(err)
 		code = e.ErrorDatabase
-		return serializer.Response{
+		return dto.Response{
 			Status: code,
 			Msg:    e.GetMsg(code),
 			Error:  err.Error(),
@@ -193,14 +193,14 @@ func (service *ProductService) Delete(id string) serializer.Response {
 	if err := model.DB.Delete(&product).Error; err != nil {
 		logging.Info(err)
 		code = e.ErrorDatabase
-		return serializer.Response{
+		return dto.Response{
 			Status: code,
 			Msg:    e.GetMsg(code),
 			Error:  err.Error(),
 		}
 
 	}
-	return serializer.Response{
+	return dto.Response{
 		Status: code,
 		Msg:    e.GetMsg(code),
 	}
@@ -208,7 +208,7 @@ func (service *ProductService) Delete(id string) serializer.Response {
 }
 
 //更新商品
-func (service *ProductService) Update(id string) serializer.Response {
+func (service *ProductService) Update(id string) dto.Response {
 	var product model.Product
 	model.DB.Model(&model.Product{}).First(&product, id)
 	product.Name = service.Name
@@ -224,13 +224,13 @@ func (service *ProductService) Update(id string) serializer.Response {
 	if err := model.DB.Save(&product).Error; err != nil {
 		logging.Info(err)
 		code = e.ErrorDatabase
-		return serializer.Response{
+		return dto.Response{
 			Status: code,
 			Msg:    e.GetMsg(code),
 			Error:  err.Error(),
 		}
 	}
-	return serializer.Response{
+	return dto.Response{
 		Status: code,
 		Msg:    e.GetMsg(code),
 	}
@@ -238,7 +238,7 @@ func (service *ProductService) Update(id string) serializer.Response {
 }
 
 //搜索商品
-func (service *ProductService) Search() serializer.Response {
+func (service *ProductService) Search() dto.Response {
 	var products []model.Product
 	code := e.SUCCESS
 	if service.PageSize == 0 {
@@ -250,18 +250,18 @@ func (service *ProductService) Search() serializer.Response {
 	if err != nil {
 		logging.Info(err)
 		code = e.ErrorDatabase
-		return serializer.Response{
+		return dto.Response{
 			Status: code,
 			Msg:    e.GetMsg(code),
 			Error:  err.Error(),
 		}
 	}
-	return serializer.BuildListResponse(serializer.BuildProducts(products), uint(len(products)))
+	return dto.BuildListResponse(dto.BuildProducts(products), uint(len(products)))
 }
 
 //获取商品列表图片
-func (service *ListProductImgService) List(id string) serializer.Response {
+func (service *ListProductImgService) List(id string) dto.Response {
 	var productImgList []model.ProductImg
 	model.DB.Model(model.ProductImg{}).Where("product_id=?", id).Find(&productImgList)
-	return serializer.BuildListResponse(serializer.BuildProductImgs(productImgList), uint(len(productImgList)))
+	return dto.BuildListResponse(dto.BuildProductImgs(productImgList), uint(len(productImgList)))
 }

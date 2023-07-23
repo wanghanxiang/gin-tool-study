@@ -1,6 +1,6 @@
-package serializer
+package dto
 
-import "product-mall/model"
+import "product-mall/internal/model"
 
 type Address struct {
 	ID       uint   `json:"id"`

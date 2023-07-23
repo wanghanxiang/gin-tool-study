@@ -2,7 +2,7 @@ package routes
 
 import (
 	api "product-mall/api/v1"
-	"product-mall/middleware"
+	"product-mall/internal/middleware"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"

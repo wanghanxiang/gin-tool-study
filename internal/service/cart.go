@@ -1,10 +1,10 @@
 package service
 
 import (
-	"product-mall/model"
+	"product-mall/dto"
+	"product-mall/internal/model"
 	"product-mall/pkg/e"
 	util "product-mall/pkg/tools"
-	"product-mall/serializer"
 	"strconv"
 )
 
@@ -19,14 +19,14 @@ type CartService struct {
 // 2、根据产品信息 创建购物车信息 产品数量创建时时间等
 // 3、已经在购物车的信息 添加的时候加一 不存在的时候创建
 // id 商品id uid 用户id
-func (service *CartService) Create(id string, uid uint) serializer.Response {
+func (service *CartService) Create(id string, uid uint) dto.Response {
 	var product model.Product
 	code := e.SUCCESS
 	if err := model.DB.First(&product, id).Error; err != nil {
 		//商品信息不存在也包含在里面
 		util.LogrusObj.Infoln(err)
 		code = e.ErrorDatabase
-		return serializer.Response{
+		return dto.Response{
 			Status: code,
 			Msg:    e.GetMsg(code),
 			Error:  err.Error(),
@@ -50,16 +50,16 @@ func (service *CartService) Create(id string, uid uint) serializer.Response {
 		if err != nil {
 			util.LogrusObj.Infoln(err)
 			code = e.ErrorDatabase
-			return serializer.Response{
+			return dto.Response{
 				Status: code,
 				Msg:    e.GetMsg(code),
 				Error:  err.Error(),
 			}
 		}
 
-		return serializer.Response{
+		return dto.Response{
 			Status: code,
-			Data:   serializer.BuildCart(cart, product, service.CreateUserID),
+			Data:   dto.BuildCart(cart, product, service.CreateUserID),
 			Msg:    e.GetMsg(code),
 		}
 
@@ -68,21 +68,21 @@ func (service *CartService) Create(id string, uid uint) serializer.Response {
 		err := model.DB.Save(&cart).Error
 		if err != nil {
 			util.LogrusObj.Infoln(err)
-			return serializer.Response{
+			return dto.Response{
 				Status: code,
 				Msg:    e.GetMsg(code),
 				Error:  err.Error(),
 			}
 		}
-		return serializer.Response{
+		return dto.Response{
 			Status: 201,
 			Msg:    "商品已经在购物车了，数量+1",
-			Data:   serializer.BuildCart(cart, product, service.CreateUserID),
+			Data:   dto.BuildCart(cart, product, service.CreateUserID),
 		}
 
 	} else {
 		//超过最大的商品数量
-		return serializer.Response{
+		return dto.Response{
 			Status: 202,
 			Msg:    "超过购物车添加的最大上限",
 		}
@@ -91,14 +91,14 @@ func (service *CartService) Create(id string, uid uint) serializer.Response {
 
 //更新购物车信息
 //id 购物车的id
-func (service *CartService) Update(id string) serializer.Response {
+func (service *CartService) Update(id string) dto.Response {
 	var cart model.Cart
 	code := e.SUCCESS
 	err := model.DB.Where("id=?", id).Find(&cart).Error
 	if err != nil {
 		util.LogrusObj.Infoln(err)
 		code := e.ErrorDatabase
-		return serializer.Response{
+		return dto.Response{
 			Status: code,
 			Msg:    e.GetMsg(code),
 			Error:  err.Error(),
@@ -111,14 +111,14 @@ func (service *CartService) Update(id string) serializer.Response {
 	if err != nil {
 		util.LogrusObj.Infoln(err)
 		code := e.ErrorDatabase
-		return serializer.Response{
+		return dto.Response{
 			Status: code,
 			Msg:    e.GetMsg(code),
 			Error:  err.Error(),
 		}
 	}
 
-	return serializer.Response{
+	return dto.Response{
 		Status: code,
 		Msg:    e.GetMsg(code),
 	}
@@ -126,14 +126,14 @@ func (service *CartService) Update(id string) serializer.Response {
 }
 
 //删除购物车信息
-func (service *CartService) Delete(pid string, uid uint) serializer.Response {
+func (service *CartService) Delete(pid string, uid uint) dto.Response {
 	var cart model.Cart
 	code := e.SUCCESS
 	err := model.DB.Where("user_id=? AND product_id=?", uid, pid).Error
 	if err != nil {
 		util.LogrusObj.Infoln(err)
 		code := e.ErrorDatabase
-		return serializer.Response{
+		return dto.Response{
 			Status: code,
 			Msg:    e.GetMsg(code),
 			Error:  err.Error(),
@@ -143,13 +143,13 @@ func (service *CartService) Delete(pid string, uid uint) serializer.Response {
 	if err != nil {
 		util.LogrusObj.Infoln(err)
 		code := e.ErrorDatabase
-		return serializer.Response{
+		return dto.Response{
 			Status: code,
 			Msg:    e.GetMsg(code),
 			Error:  err.Error(),
 		}
 	}
-	return serializer.Response{
+	return dto.Response{
 		Status: code,
 		Msg:    e.GetMsg(code),
 	}
@@ -158,7 +158,7 @@ func (service *CartService) Delete(pid string, uid uint) serializer.Response {
 
 //获取列表
 //用户id
-func (service *CartService) List(userId string) serializer.Response {
+func (service *CartService) List(userId string) dto.Response {
 	var carts []model.Cart
 	code := e.SUCCESS
 	err := model.DB.Where("user_id=?", userId).Find(&carts).Error
@@ -167,15 +167,15 @@ func (service *CartService) List(userId string) serializer.Response {
 	if err != nil {
 		util.LogrusObj.Infoln(err)
 		code := e.ErrorDatabase
-		return serializer.Response{
+		return dto.Response{
 			Status: code,
 			Msg:    e.GetMsg(code),
 			Error:  err.Error(),
 		}
 	}
-	return serializer.Response{
+	return dto.Response{
 		Status: code,
-		Data:   serializer.BuildCarts(carts),
+		Data:   dto.BuildCarts(carts),
 		Msg:    e.GetMsg(code),
 	}
 

@@ -3,7 +3,7 @@ package conf
 import (
 	"fmt"
 	"product-mall/cache"
-	"product-mall/model"
+	"product-mall/internal/model"
 
 	"os"
 	"strings"

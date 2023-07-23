@@ -1,7 +1,7 @@
-package serializer
+package dto
 
 import (
-	"product-mall/model"
+	"product-mall/internal/model"
 )
 
 type Product struct {

@@ -1,4 +1,4 @@
-package serializer
+package dto
 
 // Response 基础序列化器
 type Response struct {

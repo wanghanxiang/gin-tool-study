@@ -2,7 +2,7 @@ package main
 
 import (
 	"product-mall/conf"
-	"product-mall/routes"
+	"product-mall/internal/routes"
 )
 
 func main() {

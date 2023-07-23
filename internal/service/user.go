@@ -2,10 +2,10 @@ package service
 
 import (
 	"product-mall/conf"
-	"product-mall/model"
+	"product-mall/dto"
+	"product-mall/internal/model"
 	"product-mall/pkg/e"
 	util "product-mall/pkg/tools"
-	"product-mall/serializer"
 	"strings"
 	"time"
 
@@ -40,13 +40,13 @@ type ValidEmailService struct {
 }
 
 //注册
-func (service UserService) Register() serializer.Response {
+func (service UserService) Register() dto.Response {
 	var user model.User
 	var count int64
 	code := e.SUCCESS
 	if service.Key == "" || len(service.Key) != 16 {
 		code = e.ERROR
-		return serializer.Response{
+		return dto.Response{
 			Status: code,
 			Msg:    e.GetMsg(code),
 			Data:   "密钥长度不足",
@@ -57,7 +57,7 @@ func (service UserService) Register() serializer.Response {
 	model.DB.Model(&model.User{}).Where("user_name=?", service.UserName).Count(&count)
 	if count == 1 {
 		code = e.ErrorExistUser
-		return serializer.Response{
+		return dto.Response{
 			Status: code,
 			Msg:    e.GetMsg(code),
 		}
@@ -71,7 +71,7 @@ func (service UserService) Register() serializer.Response {
 	if err := user.SetPassword(service.Password); err != nil {
 		logging.Info(err)
 		code = e.ErrorFailEncryption
-		return serializer.Response{
+		return dto.Response{
 			Status: code,
 			Msg:    e.GetMsg(code),
 		}
@@ -81,19 +81,19 @@ func (service UserService) Register() serializer.Response {
 	if err := model.DB.Create(&user).Error; err != nil {
 		logging.Info(err)
 		code = e.ErrorDatabase
-		return serializer.Response{
+		return dto.Response{
 			Status: code,
 			Msg:    e.GetMsg(code),
 		}
 	}
-	return serializer.Response{
+	return dto.Response{
 		Status: code,
 		Msg:    e.GetMsg(code),
 	}
 }
 
 //用户登陆函数
-func (service UserService) Login() serializer.Response {
+func (service UserService) Login() dto.Response {
 	var user model.User
 	code := e.SUCCESS
 	if err := model.DB.Where("user_name=?", service.UserName).First(&user).Error; err != nil {
@@ -101,14 +101,14 @@ func (service UserService) Login() serializer.Response {
 		if gorm.IsRecordNotFoundError(err) {
 			logging.Info(err)
 			code = e.ErrorNotExistUser
-			return serializer.Response{
+			return dto.Response{
 				Status: code,
 				Msg:    e.GetMsg(code),
 			}
 		}
 		logging.Info(err)
 		code = e.ErrorDatabase
-		return serializer.Response{
+		return dto.Response{
 			Status: code,
 			Msg:    e.GetMsg(code),
 		}
@@ -116,7 +116,7 @@ func (service UserService) Login() serializer.Response {
 
 	if user.CheckPassword(service.Password) == false {
 		code = e.ErrorNotCompare
-		return serializer.Response{
+		return dto.Response{
 			Status: code,
 			Msg:    e.GetMsg(code),
 		}
@@ -126,19 +126,19 @@ func (service UserService) Login() serializer.Response {
 	if err != nil {
 		logging.Info(err)
 		code = e.ErrorAuthToken
-		return serializer.Response{
+		return dto.Response{
 			Status: code,
 			Msg:    e.GetMsg(code),
 		}
 	}
-	return serializer.Response{
+	return dto.Response{
 		Status: code,
-		Data:   serializer.TokenData{User: serializer.BuildUser(user), Token: token},
+		Data:   dto.TokenData{User: dto.BuildUser(user), Token: token},
 		Msg:    e.GetMsg(code),
 	}
 }
 
-func (service UserService) Update(id uint) serializer.Response {
+func (service UserService) Update(id uint) dto.Response {
 	var user model.User
 	code := e.SUCCESS
 	//https://gorm.io/zh_CN/docs/query.html
@@ -146,7 +146,7 @@ func (service UserService) Update(id uint) serializer.Response {
 	if err != nil {
 		logging.Info(err)
 		code = e.ErrorDatabase
-		return serializer.Response{
+		return dto.Response{
 			Status: code,
 			Msg:    e.GetMsg(code),
 			Error:  err.Error(),
@@ -161,23 +161,23 @@ func (service UserService) Update(id uint) serializer.Response {
 	if err != nil {
 		logging.Info(err)
 		code = e.ErrorDatabase
-		return serializer.Response{
+		return dto.Response{
 			Status: code,
 			Msg:    e.GetMsg(code),
 			Error:  err.Error(),
 		}
 	}
 
-	return serializer.Response{
+	return dto.Response{
 		Status: code,
-		Data:   serializer.BuildUser(user),
+		Data:   dto.BuildUser(user),
 		Msg:    e.GetMsg(code),
 	}
 
 }
 
 //检查email中的token
-func (service UserService) Valid_token(token string) serializer.Response {
+func (service UserService) Valid_token(token string) dto.Response {
 	var userID uint
 	var email string
 	var password string
@@ -207,7 +207,7 @@ func (service UserService) Valid_token(token string) serializer.Response {
 	}
 
 	if code != e.SUCCESS {
-		return serializer.Response{
+		return dto.Response{
 			Status: code,
 			Msg:    e.GetMsg(code),
 		}
@@ -217,7 +217,7 @@ func (service UserService) Valid_token(token string) serializer.Response {
 		if err := model.DB.Table("user").Where("id=?", userID).Update("email", email).Error; err != nil {
 			logging.Info(err)
 			code = e.ErrorDatabase
-			return serializer.Response{
+			return dto.Response{
 				Status: code,
 				Msg:    e.GetMsg(code),
 				Error:  err.Error(),
@@ -228,7 +228,7 @@ func (service UserService) Valid_token(token string) serializer.Response {
 		if err := model.DB.Table("user").Where("id=?", userID).Update("email", "").Error; err != nil {
 			logging.Info(err)
 			code = e.ErrorDatabase
-			return serializer.Response{
+			return dto.Response{
 				Status: code,
 				Msg:    e.GetMsg(code),
 				Error:  err.Error(),
@@ -240,7 +240,7 @@ func (service UserService) Valid_token(token string) serializer.Response {
 		if err := model.DB.First(&user, userID).Error; err != nil {
 			logging.Info(err)
 			code = e.ErrorDatabase
-			return serializer.Response{
+			return dto.Response{
 				Status: code,
 				Msg:    e.GetMsg(code),
 			}
@@ -249,7 +249,7 @@ func (service UserService) Valid_token(token string) serializer.Response {
 		if err := user.SetPassword(password); err != nil {
 			logging.Info(err)
 			code = e.ErrorFailEncryption
-			return serializer.Response{
+			return dto.Response{
 				Status: code,
 				Msg:    e.GetMsg(code),
 			}
@@ -258,37 +258,37 @@ func (service UserService) Valid_token(token string) serializer.Response {
 		if err := model.DB.Save(&user).Error; err != nil {
 			logging.Info(err)
 			code = e.ErrorDatabase
-			return serializer.Response{
+			return dto.Response{
 				Status: code,
 				Msg:    e.GetMsg(code),
 			}
 		}
 		code = e.UpdatePasswordSuccess
 		//返回修改密码成功信息
-		return serializer.Response{
+		return dto.Response{
 			Status: code,
 			Msg:    e.GetMsg(code),
 		}
 	} else {
 		//没有匹配的方法
 		code = e.InvalidParams
-		return serializer.Response{
+		return dto.Response{
 			Status: code,
 			Msg:    e.GetMsg(code),
 		}
 	}
 
 	//返回用户信息
-	return serializer.Response{
+	return dto.Response{
 		Status: code,
 		Msg:    e.GetMsg(code),
-		Data:   serializer.BuildUser(user),
+		Data:   dto.BuildUser(user),
 	}
 
 }
 
 //发送邮件的接口, 方法传入id为用户信息的id
-func (service SendEmailService) SendEmail(id uint) serializer.Response {
+func (service SendEmailService) SendEmail(id uint) dto.Response {
 	code := e.SUCCESS
 	var noticeMsg model.Notice
 	var emailAddress string
@@ -297,7 +297,7 @@ func (service SendEmailService) SendEmail(id uint) serializer.Response {
 	if err != nil {
 		logging.Info(err)
 		code = e.ErrorAuthToken
-		return serializer.Response{
+		return dto.Response{
 			Status: code,
 			Msg:    e.GetMsg(code),
 		}
@@ -306,7 +306,7 @@ func (service SendEmailService) SendEmail(id uint) serializer.Response {
 	if err := model.DB.First(&noticeMsg, service.OperationType).Error; err != nil {
 		logging.Info(err)
 		code = e.ErrorDatabase
-		return serializer.Response{
+		return dto.Response{
 			Status: code,
 			Msg:    e.GetMsg(code),
 		}
@@ -330,12 +330,12 @@ func (service SendEmailService) SendEmail(id uint) serializer.Response {
 	if err := d.DialAndSend(m); err != nil {
 		logging.Info(err)
 		code = e.ErrorSendEmail
-		return serializer.Response{
+		return dto.Response{
 			Status: code,
 			Msg:    e.GetMsg(code),
 		}
 	}
-	return serializer.Response{
+	return dto.Response{
 		Status: code,
 		Msg:    e.GetMsg(code),
 	}
