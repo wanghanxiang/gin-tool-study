@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"net/http"
 	"product-mall/pkg/e"
 	util "product-mall/pkg/tools"
 	"time"
@@ -25,7 +26,7 @@ func JWT() gin.HandlerFunc {
 			}
 		}
 		if code != e.SUCCESS {
-			c.JSON(200, gin.H{
+			c.JSON(http.StatusOK, gin.H{
 				"status": code,
 				"msg":    e.GetMsg(code),
 				"data":   data,
@@ -56,7 +57,7 @@ func JWTAdmin() gin.HandlerFunc {
 			}
 		}
 		if code != e.SUCCESS {
-			c.JSON(200, gin.H{
+			c.JSON(http.StatusOK, gin.H{
 				"status": code,
 				"msg":    e.GetMsg(code),
 				"data":   data,

@@ -1,7 +1,7 @@
 package service
 
 import (
-	"product-mall/dto"
+	"product-mall/internal/dto"
 	"product-mall/internal/model"
 	"product-mall/pkg/e"
 	util "product-mall/pkg/tools"

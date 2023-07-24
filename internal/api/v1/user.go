@@ -1,8 +1,9 @@
 package v1
 
 import (
+	"net/http"
+	"product-mall/internal/service"
 	util "product-mall/pkg/tools"
-	"product-mall/service"
 
 	"github.com/gin-gonic/gin"
 )
@@ -12,9 +13,9 @@ func UserRegister(c *gin.Context) {
 	var userRegisterService service.UserService
 	if err := c.ShouldBind(&userRegisterService); err == nil {
 		res := userRegisterService.Register()
-		c.JSON(200, res)
+		c.JSON(http.StatusOK, res)
 	} else {
-		c.JSON(400, ErrorResponse(err))
+		c.JSON(http.StatusBadRequest, ErrorResponse(err))
 		util.LogrusObj.Infoln(err)
 	}
 }
@@ -24,9 +25,9 @@ func UserLogin(c *gin.Context) {
 	var userLoginService service.UserService
 	if err := c.ShouldBind(&userLoginService); err == nil {
 		res := userLoginService.Login()
-		c.JSON(200, res)
+		c.JSON(http.StatusOK, res)
 	} else {
-		c.JSON(400, ErrorResponse(err))
+		c.JSON(http.StatusBadRequest, ErrorResponse(err))
 		util.LogrusObj.Infoln(err)
 	}
 }
@@ -37,9 +38,9 @@ func UserUpdate(c *gin.Context) {
 	claims, _ := util.ParseToken(c.GetHeader("Cookie"))
 	if err := c.ShouldBind(&userUpdateService); err == nil {
 		res := userUpdateService.Update(claims.ID)
-		c.JSON(200, res)
+		c.JSON(http.StatusOK, res)
 	} else {
-		c.JSON(400, ErrorResponse(err))
+		c.JSON(http.StatusBadRequest, ErrorResponse(err))
 		util.LogrusObj.Infoln(err)
 	}
 }
@@ -51,9 +52,9 @@ func SendEmail(c *gin.Context) {
 	claims, _ := util.ParseToken(c.GetHeader("Cookie"))
 	if err := c.ShouldBind(&sendEmailService); err == nil {
 		res := sendEmailService.SendEmail(claims.ID)
-		c.JSON(200, res)
+		c.JSON(http.StatusOK, res)
 	} else {
-		c.JSON(400, ErrorResponse(err))
+		c.JSON(http.StatusBadRequest, ErrorResponse(err))
 		util.LogrusObj.Infoln(err)
 	}
 }

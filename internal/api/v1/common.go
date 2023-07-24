@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"product-mall/conf"
-	"product-mall/dto"
+	"product-mall/internal/dto"
 
 	"github.com/go-playground/validator/v10"
 )

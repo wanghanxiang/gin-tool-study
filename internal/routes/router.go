@@ -1,7 +1,8 @@
 package routes
 
 import (
-	api "product-mall/api/v1"
+	"net/http"
+	api "product-mall/internal/api/v1"
 	"product-mall/internal/middleware"
 
 	"github.com/gin-contrib/sessions"
@@ -19,7 +20,7 @@ func NewRouter() *gin.Engine {
 	{
 
 		v1.GET("ping", func(c *gin.Context) {
-			c.JSON(200, "success")
+			c.JSON(http.StatusOK, "success")
 		})
 
 		//用户操作

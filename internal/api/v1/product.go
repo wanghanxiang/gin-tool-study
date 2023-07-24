@@ -2,8 +2,9 @@ package v1
 
 import (
 	"fmt"
+	"net/http"
+	"product-mall/internal/service"
 	util "product-mall/pkg/tools"
-	"product-mall/service"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,9 +19,9 @@ func CreateProduct(c *gin.Context) {
 	claims, _ := util.ParseToken(c.GetHeader("Cookie"))
 	if err := c.ShouldBind(&productService); err == nil {
 		res := productService.Create(claims.ID, files)
-		c.JSON(200, res)
+		c.JSON(http.StatusOK, res)
 	} else {
-		c.JSON(400, ErrorResponse(err))
+		c.JSON(http.StatusBadRequest, ErrorResponse(err))
 		util.LogrusObj.Infoln(err)
 	}
 

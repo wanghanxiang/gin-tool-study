@@ -2,7 +2,7 @@ package service
 
 import (
 	"mime/multipart"
-	"product-mall/dto"
+	"product-mall/internal/dto"
 	"product-mall/internal/model"
 	"product-mall/pkg/e"
 

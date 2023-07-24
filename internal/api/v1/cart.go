@@ -1,8 +1,9 @@
 package v1
 
 import (
+	"net/http"
+	"product-mall/internal/service"
 	util "product-mall/pkg/tools"
-	"product-mall/service"
 
 	"github.com/gin-gonic/gin"
 )
@@ -12,9 +13,9 @@ func CreateCart(c *gin.Context) {
 	claim, _ := util.ParseToken(c.GetHeader("Authorization"))
 	if err := c.ShouldBind(&createCartService); err == nil {
 		res := createCartService.Create(c.Param("id"), claim.ID)
-		c.JSON(200, res)
+		c.JSON(http.StatusOK, res)
 	} else {
-		c.JSON(400, ErrorResponse(err))
+		c.JSON(http.StatusBadRequest, ErrorResponse(err))
 		util.LogrusObj.Infoln(err)
 	}
 }
@@ -22,16 +23,16 @@ func CreateCart(c *gin.Context) {
 func ShowList(c *gin.Context) {
 	showCartsService := service.CartService{}
 	res := showCartsService.List(c.Param("id"))
-	c.JSON(200, res)
+	c.JSON(http.StatusOK, res)
 }
 
 func UpdateCart(c *gin.Context) {
 	updateCartService := service.CartService{}
 	if err := c.ShouldBind(&updateCartService); err == nil {
 		res := updateCartService.Update(c.Param("id"))
-		c.JSON(200, res)
+		c.JSON(http.StatusOK, res)
 	} else {
-		c.JSON(400, ErrorResponse(err))
+		c.JSON(http.StatusBadRequest, ErrorResponse(err))
 		util.LogrusObj.Infoln(err)
 	}
 }
@@ -41,9 +42,9 @@ func DeleteCart(c *gin.Context) {
 	claim, _ := util.ParseToken(c.GetHeader("Authorization"))
 	if err := c.ShouldBind(&deleteCartService); err == nil {
 		res := deleteCartService.Delete(c.Param("id"), claim.ID)
-		c.JSON(200, res)
+		c.JSON(http.StatusOK, res)
 	} else {
-		c.JSON(400, ErrorResponse(err))
+		c.JSON(http.StatusBadRequest, ErrorResponse(err))
 		util.LogrusObj.Infoln(err)
 	}
 }
