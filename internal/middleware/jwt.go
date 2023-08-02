@@ -2,8 +2,8 @@ package middleware
 
 import (
 	"net/http"
+	util "product-mall/internal/tools"
 	"product-mall/pkg/e"
-	util "product-mall/pkg/tools"
 	"time"
 
 	"github.com/gin-gonic/gin"

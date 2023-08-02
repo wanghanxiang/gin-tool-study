@@ -3,7 +3,7 @@ package v1
 import (
 	"net/http"
 	"product-mall/internal/service"
-	util "product-mall/pkg/tools"
+	util "product-mall/internal/tools"
 
 	"github.com/gin-gonic/gin"
 )
