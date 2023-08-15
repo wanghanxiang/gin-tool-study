@@ -1,6 +1,9 @@
 package dto
 
-import "product-mall/internal/model"
+import (
+	"product-mall/internal/model"
+	"product-mall/pkg/db"
+)
 
 //购物车
 type Cart struct {
@@ -42,7 +45,7 @@ func BuildCarts(items []model.Cart) (carts []Cart) {
 		productInfo := model.Product{}
 		var productCreateUserID uint
 		productCreateUserID = cartInfo.ProductCreateUserID
-		err := model.DB.First(&productInfo, cartInfo.ProductID, cartInfo.ProductCreateUserID).Error
+		err := db.GetDB().First(&productInfo, cartInfo.ProductID, cartInfo.ProductCreateUserID).Error
 		if err != nil {
 			continue
 		}

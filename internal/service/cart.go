@@ -4,6 +4,7 @@ import (
 	"product-mall/internal/dto"
 	"product-mall/internal/model"
 	util "product-mall/internal/tools"
+	"product-mall/pkg/db"
 	"product-mall/pkg/e"
 	"strconv"
 )
@@ -22,7 +23,7 @@ type CartService struct {
 func (service *CartService) Create(id string, uid uint) dto.Response {
 	var product model.Product
 	code := e.SUCCESS
-	if err := model.DB.First(&product, id).Error; err != nil {
+	if err := db.GetDB().First(&product, id).Error; err != nil {
 		//商品信息不存在也包含在里面
 		util.LogrusObj.Infoln(err)
 		code = e.ErrorDatabase
@@ -35,7 +36,7 @@ func (service *CartService) Create(id string, uid uint) dto.Response {
 
 	cartId, _ := strconv.Atoi(id)
 	var cart model.Cart
-	model.DB.Where("user_id=? AND product_id=? AND product_create_user_id=?", uid, id, product.CreateUserID).First(&cart)
+	db.GetDB().Where("user_id=? AND product_id=? AND product_create_user_id=?", uid, id, product.CreateUserID).First(&cart)
 	if cart == (model.Cart{}) {
 		//不存在购物车信息则创建
 		cart = model.Cart{
@@ -46,7 +47,7 @@ func (service *CartService) Create(id string, uid uint) dto.Response {
 			MaxNum:              10,
 			Check:               false,
 		}
-		err := model.DB.Create(&cart).Error
+		err := db.GetDB().Create(&cart).Error
 		if err != nil {
 			util.LogrusObj.Infoln(err)
 			code = e.ErrorDatabase
@@ -65,7 +66,7 @@ func (service *CartService) Create(id string, uid uint) dto.Response {
 
 	} else if cart.Num < cart.MaxNum {
 		cart.Num++
-		err := model.DB.Save(&cart).Error
+		err := db.GetDB().Save(&cart).Error
 		if err != nil {
 			util.LogrusObj.Infoln(err)
 			return dto.Response{
@@ -94,7 +95,7 @@ func (service *CartService) Create(id string, uid uint) dto.Response {
 func (service *CartService) Update(id string) dto.Response {
 	var cart model.Cart
 	code := e.SUCCESS
-	err := model.DB.Where("id=?", id).Find(&cart).Error
+	err := db.GetDB().Where("id=?", id).Find(&cart).Error
 	if err != nil {
 		util.LogrusObj.Infoln(err)
 		code := e.ErrorDatabase
@@ -107,7 +108,7 @@ func (service *CartService) Update(id string) dto.Response {
 
 	//更新数量
 	cart.Num = service.Num
-	err = model.DB.Save(&cart).Error
+	err = db.GetDB().Save(&cart).Error
 	if err != nil {
 		util.LogrusObj.Infoln(err)
 		code := e.ErrorDatabase
@@ -129,7 +130,7 @@ func (service *CartService) Update(id string) dto.Response {
 func (service *CartService) Delete(pid string, uid uint) dto.Response {
 	var cart model.Cart
 	code := e.SUCCESS
-	err := model.DB.Where("user_id=? AND product_id=?", uid, pid).Error
+	err := db.GetDB().Where("user_id=? AND product_id=?", uid, pid).Error
 	if err != nil {
 		util.LogrusObj.Infoln(err)
 		code := e.ErrorDatabase
@@ -139,7 +140,7 @@ func (service *CartService) Delete(pid string, uid uint) dto.Response {
 			Error:  err.Error(),
 		}
 	}
-	err = model.DB.Delete(&cart).Error
+	err = db.GetDB().Delete(&cart).Error
 	if err != nil {
 		util.LogrusObj.Infoln(err)
 		code := e.ErrorDatabase
@@ -161,7 +162,7 @@ func (service *CartService) Delete(pid string, uid uint) dto.Response {
 func (service *CartService) List(userId string) dto.Response {
 	var carts []model.Cart
 	code := e.SUCCESS
-	err := model.DB.Where("user_id=?", userId).Find(&carts).Error
+	err := db.GetDB().Where("user_id=?", userId).Find(&carts).Error
 
 	util.LogrusObj.Infoln("1111")
 	if err != nil {

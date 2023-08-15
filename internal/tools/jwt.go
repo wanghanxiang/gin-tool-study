@@ -1,6 +1,7 @@
 package tools
 
 import (
+	"product-mall/conf"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -36,6 +37,20 @@ func GenerateToken(id uint, username string, authority int) (string, error) {
 
 //ParseToken 验证用户token
 func ParseToken(token string) (*Claims, error) {
+	if conf.ENV == "dev" {
+		expireTime := time.Now().Add(24 * time.Hour)
+		claims := Claims{
+			ID:        1,
+			Username:  "xiangzai",
+			Authority: 123,
+			StandardClaims: jwt.StandardClaims{
+				ExpiresAt: expireTime.Unix(),
+				Issuer:    "xaingzai",
+			},
+		}
+		return &claims, nil
+	}
+
 	tokenClaims, err := jwt.ParseWithClaims(token, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return jwtSecret, nil
 	})

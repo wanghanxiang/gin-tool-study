@@ -3,11 +3,12 @@ package main
 import (
 	"product-mall/conf"
 	"product-mall/internal/routes"
+	"product-mall/pkg/db"
 )
 
 func main() {
-	// Ek1+Ep1==Ek2+Ep2
 	conf.Init()
+	db.Database(conf.MysqlpathRead, conf.MysqlpathWrite)
 	r := routes.NewRouter()
 	_ = r.Run(conf.HttpPort)
 }

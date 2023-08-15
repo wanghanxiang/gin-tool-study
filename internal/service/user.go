@@ -5,6 +5,7 @@ import (
 	"product-mall/internal/dto"
 	"product-mall/internal/model"
 	util "product-mall/internal/tools"
+	"product-mall/pkg/db"
 	"product-mall/pkg/e"
 	"strings"
 	"time"
@@ -54,7 +55,7 @@ func (service UserService) Register() dto.Response {
 	}
 	//密钥，支付密码
 	util.Encrypt.SetKey(service.Key)
-	model.DB.Model(&model.User{}).Where("user_name=?", service.UserName).Count(&count)
+	db.GetDB().Model(&model.User{}).Where("user_name=?", service.UserName).Count(&count)
 	if count == 1 {
 		code = e.ErrorExistUser
 		return dto.Response{
@@ -78,7 +79,7 @@ func (service UserService) Register() dto.Response {
 	}
 	user.Avatar = "http://q1.qlogo.cn/g?b=qq&nk=294350394&s=640"
 	//创建用户
-	if err := model.DB.Create(&user).Error; err != nil {
+	if err := db.GetDB().Create(&user).Error; err != nil {
 		logging.Info(err)
 		code = e.ErrorDatabase
 		return dto.Response{
@@ -96,7 +97,7 @@ func (service UserService) Register() dto.Response {
 func (service UserService) Login() dto.Response {
 	var user model.User
 	code := e.SUCCESS
-	if err := model.DB.Where("user_name=?", service.UserName).First(&user).Error; err != nil {
+	if err := db.GetDB().Where("user_name=?", service.UserName).First(&user).Error; err != nil {
 		//如果查询不到，返回相应的错误
 		if gorm.IsRecordNotFoundError(err) {
 			logging.Info(err)
@@ -142,7 +143,7 @@ func (service UserService) Update(id uint) dto.Response {
 	var user model.User
 	code := e.SUCCESS
 	//https://gorm.io/zh_CN/docs/query.html
-	err := model.DB.Where("id", id).First(&user).Error
+	err := db.GetDB().Where("id", id).First(&user).Error
 	if err != nil {
 		logging.Info(err)
 		code = e.ErrorDatabase
@@ -157,7 +158,7 @@ func (service UserService) Update(id uint) dto.Response {
 		user.Nickname = service.NickName
 	}
 
-	err = model.DB.Save(&user).Error
+	err = db.GetDB().Save(&user).Error
 	if err != nil {
 		logging.Info(err)
 		code = e.ErrorDatabase
@@ -214,7 +215,7 @@ func (service UserService) Valid_token(token string) dto.Response {
 	}
 	// 绑定邮箱
 	if operationType == 1 {
-		if err := model.DB.Table("user").Where("id=?", userID).Update("email", email).Error; err != nil {
+		if err := db.GetDB().Table("user").Where("id=?", userID).Update("email", email).Error; err != nil {
 			logging.Info(err)
 			code = e.ErrorDatabase
 			return dto.Response{
@@ -225,7 +226,7 @@ func (service UserService) Valid_token(token string) dto.Response {
 		}
 	} else if operationType == 2 {
 		//解除绑定邮箱
-		if err := model.DB.Table("user").Where("id=?", userID).Update("email", "").Error; err != nil {
+		if err := db.GetDB().Table("user").Where("id=?", userID).Update("email", "").Error; err != nil {
 			logging.Info(err)
 			code = e.ErrorDatabase
 			return dto.Response{
@@ -237,7 +238,7 @@ func (service UserService) Valid_token(token string) dto.Response {
 
 	} else if operationType == 3 {
 		//获取用户信息
-		if err := model.DB.First(&user, userID).Error; err != nil {
+		if err := db.GetDB().First(&user, userID).Error; err != nil {
 			logging.Info(err)
 			code = e.ErrorDatabase
 			return dto.Response{
@@ -255,7 +256,7 @@ func (service UserService) Valid_token(token string) dto.Response {
 			}
 		}
 		//更新数据
-		if err := model.DB.Save(&user).Error; err != nil {
+		if err := db.GetDB().Save(&user).Error; err != nil {
 			logging.Info(err)
 			code = e.ErrorDatabase
 			return dto.Response{
@@ -303,7 +304,7 @@ func (service SendEmailService) SendEmail(id uint) dto.Response {
 		}
 	}
 	//获取对应的邮件提醒的数据
-	if err := model.DB.First(&noticeMsg, service.OperationType).Error; err != nil {
+	if err := db.GetDB().First(&noticeMsg, service.OperationType).Error; err != nil {
 		logging.Info(err)
 		code = e.ErrorDatabase
 		return dto.Response{

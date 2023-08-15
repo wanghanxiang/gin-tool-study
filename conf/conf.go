@@ -3,7 +3,6 @@ package conf
 import (
 	"fmt"
 	"product-mall/cache"
-	"product-mall/internal/model"
 
 	"os"
 	"strings"
@@ -38,6 +37,9 @@ var (
 	RedisAddr   string
 	RedisPw     string
 	RedisDbName string
+
+	MysqlpathRead  string
+	MysqlpathWrite string
 )
 
 func Init() {
@@ -67,9 +69,8 @@ func Init() {
 	cache.NewRedis(RedisAddr, RedisDbName, "")
 
 	//MySQL
-	pathRead := strings.Join([]string{DbUser, ":", DbPassWord, "@tcp(", DbHost, ":", DbPort, ")/", DbName, "?charset=utf8&parseTime=true"}, "")
-	pathWrite := strings.Join([]string{DbUser, ":", DbPassWord, "@tcp(", DbHost, ":", DbPort, ")/", DbName, "?charset=utf8&parseTime=true"}, "")
-	model.Database(pathRead, pathWrite)
+	MysqlpathRead = strings.Join([]string{DbUser, ":", DbPassWord, "@tcp(", DbHost, ":", DbPort, ")/", DbName, "?charset=utf8&parseTime=true"}, "")
+	MysqlpathWrite = strings.Join([]string{DbUser, ":", DbPassWord, "@tcp(", DbHost, ":", DbPort, ")/", DbName, "?charset=utf8&parseTime=true"}, "")
 }
 
 func LoadServer(file *ini.File) {

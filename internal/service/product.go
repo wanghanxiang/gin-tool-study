@@ -4,6 +4,7 @@ import (
 	"mime/multipart"
 	"product-mall/internal/dto"
 	"product-mall/internal/model"
+	"product-mall/pkg/db"
 	"product-mall/pkg/e"
 
 	logging "github.com/sirupsen/logrus"
@@ -36,7 +37,7 @@ func (service *ProductService) Create(id uint, files []*multipart.FileHeader) dt
 	code := e.SUCCESS
 	//获取用户信息
 	var user model.User
-	if err := model.DB.Model(&model.User{}).Where("id = ?", id).First(&user).Error; err != nil {
+	if err := db.GetDB().Model(&model.User{}).Where("id = ?", id).First(&user).Error; err != nil {
 		code = e.ErrorExistUser
 		return dto.Response{
 			Status: code,
@@ -67,7 +68,7 @@ func (service *ProductService) Create(id uint, files []*multipart.FileHeader) dt
 		CreateUserName:   user.UserName,
 		CreateUserAvatar: user.Avatar,
 	}
-	err := model.DB.Create(&product).Error
+	err := db.GetDB().Create(&product).Error
 	if err != nil {
 		logging.Info(err)
 		code = e.ErrorDatabase
@@ -93,7 +94,7 @@ func (service *ProductService) Create(id uint, files []*multipart.FileHeader) dt
 			ProductID: product.ID,
 			ImgPath:   info,
 		}
-		err = model.DB.Create(&productImg).Error
+		err = db.GetDB().Create(&productImg).Error
 		if err != nil {
 			code = e.ERROR
 			return dto.Response{
@@ -121,7 +122,7 @@ func (service *ProductService) List() dto.Response {
 	}
 	//如果传入的商品的CategoryID为0的话
 	if service.CategoryID == 0 {
-		if err := model.DB.Model(model.Product{}).Count(&total).Error; err != nil {
+		if err := db.GetDB().Model(model.Product{}).Count(&total).Error; err != nil {
 			logging.Info(err)
 			code = e.ErrorDatabase
 			return dto.Response{
@@ -130,7 +131,7 @@ func (service *ProductService) List() dto.Response {
 				Error:  err.Error(),
 			}
 		}
-		if err := model.DB.Offset((service.PageNum - 1) * service.PageSize).
+		if err := db.GetDB().Offset((service.PageNum - 1) * service.PageSize).
 			Limit(service.PageSize).Find(&products).
 			Error; err != nil {
 			logging.Info(err)
@@ -144,7 +145,7 @@ func (service *ProductService) List() dto.Response {
 
 	} else {
 		//Preload 预处理用来处理一对多关系的
-		if err := model.DB.Model(model.Product{}).Preload("Category").
+		if err := db.GetDB().Model(model.Product{}).Preload("Category").
 			Where("category_id = ?", service.CategoryID).
 			Count(&total).Error; err != nil {
 			logging.Info(err)
@@ -156,7 +157,7 @@ func (service *ProductService) List() dto.Response {
 			}
 		}
 
-		if err := model.DB.Model(model.Product{}).Preload("Category").
+		if err := db.GetDB().Model(model.Product{}).Preload("Category").
 			Where("category_id=?", service.CategoryID).
 			Offset((service.PageNum - 1) * service.PageSize).
 			Limit(service.PageSize).
@@ -180,7 +181,7 @@ func (service *ProductService) Delete(id string) dto.Response {
 	code := e.SUCCESS
 	var product model.Product
 	//判断商品是否存在
-	if err := model.DB.First(&product, id).Error; err != nil {
+	if err := db.GetDB().First(&product, id).Error; err != nil {
 		logging.Info(err)
 		code = e.ErrorDatabase
 		return dto.Response{
@@ -190,7 +191,7 @@ func (service *ProductService) Delete(id string) dto.Response {
 		}
 	}
 	//存在则删除商品
-	if err := model.DB.Delete(&product).Error; err != nil {
+	if err := db.GetDB().Delete(&product).Error; err != nil {
 		logging.Info(err)
 		code = e.ErrorDatabase
 		return dto.Response{
@@ -210,7 +211,7 @@ func (service *ProductService) Delete(id string) dto.Response {
 //更新商品
 func (service *ProductService) Update(id string) dto.Response {
 	var product model.Product
-	model.DB.Model(&model.Product{}).First(&product, id)
+	db.GetDB().Model(&model.Product{}).First(&product, id)
 	product.Name = service.Name
 	product.CategoryID = uint(service.CategoryID)
 	product.Title = service.Title
@@ -221,7 +222,7 @@ func (service *ProductService) Update(id string) dto.Response {
 	product.OnSale = service.OnSale
 	code := e.SUCCESS
 
-	if err := model.DB.Save(&product).Error; err != nil {
+	if err := db.GetDB().Save(&product).Error; err != nil {
 		logging.Info(err)
 		code = e.ErrorDatabase
 		return dto.Response{
@@ -244,7 +245,7 @@ func (service *ProductService) Search() dto.Response {
 	if service.PageSize == 0 {
 		service.PageSize = 15
 	}
-	err := model.DB.Where("name LIKE ? OR info LIKE ?", "%"+service.Info+"%", "%"+service.Info+"%").
+	err := db.GetDB().Where("name LIKE ? OR info LIKE ?", "%"+service.Info+"%", "%"+service.Info+"%").
 		Offset((service.PageNum - 1) * service.PageSize).
 		Limit(service.PageSize).Find(&products).Error
 	if err != nil {
@@ -262,6 +263,6 @@ func (service *ProductService) Search() dto.Response {
 //获取商品列表图片
 func (service *ListProductImgService) List(id string) dto.Response {
 	var productImgList []model.ProductImg
-	model.DB.Model(model.ProductImg{}).Where("product_id=?", id).Find(&productImgList)
+	db.GetDB().Model(model.ProductImg{}).Where("product_id=?", id).Find(&productImgList)
 	return dto.BuildListResponse(dto.BuildProductImgs(productImgList), uint(len(productImgList)))
 }

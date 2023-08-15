@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"net/http"
+	"product-mall/conf"
 	util "product-mall/internal/tools"
 	"product-mall/pkg/e"
 	"time"
@@ -15,6 +16,13 @@ func JWT() gin.HandlerFunc {
 		var data interface{}
 		code = 200
 		token := c.GetHeader("Cookie")
+
+		if conf.ENV == "dev" {
+			//测试环境走下去
+			c.Next()
+			return
+		}
+
 		if token == "" {
 			code = 404
 		} else {
@@ -44,6 +52,11 @@ func JWTAdmin() gin.HandlerFunc {
 		var code int
 		var data interface{}
 		token := c.GetHeader("Cookie")
+		if conf.ENV == "dev" {
+			//测试环境走下去
+			c.Next()
+			return
+		}
 		if token == "" {
 			code = e.InvalidParams
 		} else {

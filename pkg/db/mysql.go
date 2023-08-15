@@ -1,6 +1,10 @@
-package model
+package db
 
 import (
+	"context"
+	"fmt"
+	"os"
+	"product-mall/internal/model"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -13,7 +17,7 @@ import (
 
 var DB *gorm.DB
 
-func Database(connRead, connWrite string) {
+func Database(connRead, connWrite string) *gorm.DB {
 	var ormLogger logger.Interface
 	if gin.Mode() == "debug" {
 		ormLogger = logger.Default.LogMode(logger.Info)
@@ -49,5 +53,32 @@ func Database(connRead, connWrite string) {
 			Policy:   dbresolver.RandomPolicy{},                                      // sources/replicas 负载均衡策略
 		}))
 	//迁移 schema
-	migration()
+	Migration()
+	return DB
+}
+
+//自动迁移模式
+func Migration() {
+	err := DB.Set("gorm:table_options", "charset=utf8mb4").
+		AutoMigrate(&model.User{},
+			&model.Notice{},
+			&model.Product{},
+			&model.ProductImg{},
+			&model.Address{},
+			&model.Cart{})
+	if err != nil {
+		fmt.Println("register table fail")
+		os.Exit(0)
+	}
+	fmt.Println("register table success")
+}
+
+// 获取db
+func GetDBCtx(ctx context.Context) *gorm.DB {
+	return DB.WithContext(ctx)
+}
+
+// 获取db
+func GetDB() *gorm.DB {
+	return DB
 }
