@@ -65,7 +65,6 @@ func (service AddressService) Create(id uint) dto.Response {
 func (service AddressService) List(id uint) dto.Response {
 	code := e.SUCCESS
 	repo := mysql.NewAddressRepo()
-
 	var addresses []model.Address
 	addresses, err := repo.GetAddressByUid(id)
 	if err != nil {

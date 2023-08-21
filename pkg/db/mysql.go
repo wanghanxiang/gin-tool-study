@@ -3,11 +3,14 @@ package db
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
+	"product-mall/conf"
 	"product-mall/internal/model"
 	"time"
 
-	"github.com/gin-gonic/gin"
+	util "product-mall/internal/tools"
+
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -17,13 +20,20 @@ import (
 
 var DB *gorm.DB
 
-func Database(connRead, connWrite string) *gorm.DB {
-	var ormLogger logger.Interface
-	if gin.Mode() == "debug" {
-		ormLogger = logger.Default.LogMode(logger.Info)
+type ormLog struct{}
+
+//orm 日志记录
+func (l ormLog) Printf(format string, args ...interface{}) {
+	//if gin.Mode() == "dev" {
+	if conf.ENV == "dev" {
+		util.LogrusObj.Printf(format, args...)
 	} else {
-		ormLogger = logger.Default
+		log.Printf(format, args...)
 	}
+}
+
+func Database(connRead, connWrite string) *gorm.DB {
+
 	db, err := gorm.Open(mysql.New(mysql.Config{
 		DSN:                       connRead, // DSN data source name
 		DefaultStringSize:         256,      // string 类型字段的默认长度
@@ -32,7 +42,10 @@ func Database(connRead, connWrite string) *gorm.DB {
 		DontSupportRenameColumn:   true,     // 用 `change` 重命名列，MySQL 8 之前的数据库和 MariaDB 不支持重命名列
 		SkipInitializeWithVersion: false,    // 根据版本自动配置
 	}), &gorm.Config{
-		Logger: ormLogger,
+		Logger: logger.New(ormLog{}, logger.Config{
+			SlowThreshold: time.Second,
+			LogLevel:      logger.Info,
+		}),
 		NamingStrategy: schema.NamingStrategy{
 			SingularTable: true,
 		},

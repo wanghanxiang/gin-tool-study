@@ -10,9 +10,7 @@ import (
 //新增收货地址
 func CreateAddress(c *gin.Context) {
 	service := service.AddressService{}
-	util.LogrusObj.Infoln(123)
 	claim, _ := util.ParseToken(c.GetHeader("Cookie"))
-	util.LogrusObj.Infoln(456)
 
 	if err := c.BindJSON(&service); err == nil {
 		res := service.Create(claim.ID)
@@ -26,6 +24,7 @@ func CreateAddress(c *gin.Context) {
 //展示收货地址
 func ShowAddresses(c *gin.Context) {
 	service := service.AddressService{}
+	util.LogrusObj.WithContext(c).Info(c.Param("id"))
 	res := service.Show(c.Param("id"))
 	c.JSON(200, res)
 }
