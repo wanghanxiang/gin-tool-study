@@ -24,7 +24,7 @@ func CreateAddress(c *gin.Context) {
 //展示收货地址
 func ShowAddresses(c *gin.Context) {
 	service := service.AddressService{}
-	util.LogrusObj.WithContext(c).Info(c.Param("id"))
+	util.LogrusObj.WithContext(c).Infof("ShowAddresses param %s", c.Param("id"))
 	res := service.Show(c.Param("id"))
 	c.JSON(200, res)
 }

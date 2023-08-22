@@ -16,6 +16,7 @@ func NewRouter() *gin.Engine {
 	store := cookie.NewStore([]byte("something-very-secret"))
 	r.Use(middleware.Cors())
 	r.Use(middleware.WithRequsetId()) //增加request_id
+	r.Use(middleware.Logger())
 	r.Use(sessions.Sessions("mysession", store))
 	v1 := r.Group("api/v1")
 	{

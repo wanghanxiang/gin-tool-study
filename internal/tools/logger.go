@@ -31,6 +31,9 @@ func init() {
 	logger.SetFormatter(&logrus.JSONFormatter{
 		TimestampFormat: "2006-01-02 15:04:05",
 	})
+
+	// 取消线程安全
+	logger.SetNoLock()
 	/*
 		加个hook形成ELK体系
 		但是考虑到一些同学一下子接受不了那么多技术栈，
