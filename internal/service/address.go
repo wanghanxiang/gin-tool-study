@@ -1,14 +1,14 @@
 package service
 
 import (
+	"context"
 	"product-mall/internal/dto"
 	"product-mall/internal/model"
 	"product-mall/internal/repo/mysql"
-	util "product-mall/internal/tools"
 	"product-mall/pkg/e"
 	"strconv"
 
-	logging "github.com/sirupsen/logrus"
+	"product-mall/pkg/pkg_logger"
 )
 
 //绑定json数据
@@ -18,10 +18,10 @@ type AddressService struct {
 	Address string `json:"address"`
 }
 
-func (service AddressService) Create(id uint) dto.Response {
+func (service AddressService) Create(ctx context.Context, id uint) dto.Response {
 	//插入数据
 	code := e.SUCCESS
-	repo := mysql.NewAddressRepo()
+	repo := mysql.NewAddressRepo(ctx)
 
 	address := model.Address{
 		UserID:  id,
@@ -30,9 +30,8 @@ func (service AddressService) Create(id uint) dto.Response {
 		Address: service.Address,
 	}
 	err := repo.Create(&address)
-
 	if err != nil {
-		util.LogrusObj.Errorln(err)
+		pkg_logger.LogrusObj.WithContext(ctx).Errorf("db error:%s", err.Error())
 		code = e.ErrorDatabase
 		return dto.Response{
 			Status: code,
@@ -46,7 +45,7 @@ func (service AddressService) Create(id uint) dto.Response {
 
 	if err != nil {
 		code = e.ErrorDatabase
-		util.LogrusObj.Errorln(err)
+		pkg_logger.LogrusObj.WithContext(ctx).Errorf("db error:%s", err.Error())
 		return dto.Response{
 			Status: code,
 			Msg:    e.GetMsg(code),
@@ -62,12 +61,13 @@ func (service AddressService) Create(id uint) dto.Response {
 
 }
 
-func (service AddressService) List(id uint) dto.Response {
+func (service AddressService) List(ctx context.Context, id uint) dto.Response {
 	code := e.SUCCESS
-	repo := mysql.NewAddressRepo()
+	repo := mysql.NewAddressRepo(ctx)
 	var addresses []model.Address
 	addresses, err := repo.GetAddressByUid(id)
 	if err != nil {
+		pkg_logger.LogrusObj.WithContext(ctx).Errorf("db error:%s", err.Error())
 		code = e.ErrorDatabase
 		return dto.Response{
 			Status: code,
@@ -84,15 +84,15 @@ func (service AddressService) List(id uint) dto.Response {
 
 }
 
-func (service AddressService) Delete(id string) dto.Response {
+func (service AddressService) Delete(ctx context.Context, id string) dto.Response {
 	//可以先找出来对应id的数据
 	code := e.SUCCESS
-	repo := mysql.NewAddressRepo()
+	repo := mysql.NewAddressRepo(ctx)
 
 	var address model.Address
 	address, err := repo.GetAddressById(id)
 	if err != nil {
-		util.LogrusObj.Errorln(err)
+		pkg_logger.LogrusObj.WithContext(ctx).Errorf("db error:%s", err.Error())
 		code = e.ErrorDatabase
 		return dto.Response{
 			Status: code,
@@ -103,7 +103,7 @@ func (service AddressService) Delete(id string) dto.Response {
 	err = repo.DeleteAddress(address)
 	if err != nil {
 		code = e.ErrorDatabase
-		util.LogrusObj.Errorln(err)
+		pkg_logger.LogrusObj.Errorln(err)
 		return dto.Response{
 			Status: code,
 			Msg:    e.GetMsg(code),
@@ -116,9 +116,9 @@ func (service AddressService) Delete(id string) dto.Response {
 	}
 
 }
-func (service AddressService) Update(uid uint, aid string) dto.Response {
+func (service AddressService) Update(ctx context.Context, uid uint, aid string) dto.Response {
 	code := e.SUCCESS
-	repo := mysql.NewAddressRepo()
+	repo := mysql.NewAddressRepo(ctx)
 
 	address := model.Address{
 		Address: service.Address,
@@ -157,15 +157,14 @@ func (service AddressService) Update(uid uint, aid string) dto.Response {
 
 }
 
-func (service *AddressService) Show(id string) dto.Response {
+func (service *AddressService) Show(ctx context.Context, id string) dto.Response {
 	var addresses []model.Address
-	repo := mysql.NewAddressRepo()
+	repo := mysql.NewAddressRepo(ctx)
 
 	code := e.SUCCESS
 	addresses, err := repo.GetAddressByUid(id)
 
 	if err != nil {
-		logging.Info(err)
 		code = e.ErrorDatabase
 		return dto.Response{
 			Status: code,

@@ -1,11 +1,10 @@
-package tools
+package pkg_logger
 
 import (
 	"fmt"
 	"log"
 	"os"
 	"path"
-	"product-mall/internal/constants"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -26,7 +25,7 @@ func init() {
 	//设置输出
 	logger.Out = src
 	//设置日志级别
-	logger.SetLevel(logrus.InfoLevel)
+	logger.SetLevel(logrus.DebugLevel)
 	//设置日志格式
 	logger.SetFormatter(&logrus.JSONFormatter{
 		TimestampFormat: "2006-01-02 15:04:05",
@@ -75,27 +74,4 @@ func setOutputFile() (*os.File, error) {
 		return nil, err
 	}
 	return src, nil
-}
-
-// 打印日志时，多输出一个字段
-type LogTrace struct {
-}
-
-func NewLogTrace() LogTrace {
-	return LogTrace{}
-}
-
-func (hook LogTrace) Levels() []logrus.Level {
-	return logrus.AllLevels
-}
-
-func (hook LogTrace) Fire(entry *logrus.Entry) error {
-	ctx := entry.Context
-	if ctx != nil {
-		traceId := ctx.Value(constants.HeaderXRequestID)
-		if traceId != nil {
-			entry.Data[constants.HeaderXRequestID] = traceId
-		}
-	}
-	return nil
 }

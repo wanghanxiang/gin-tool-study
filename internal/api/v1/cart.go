@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"product-mall/internal/service"
 	util "product-mall/internal/tools"
+	"product-mall/pkg/pkg_logger"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,7 +17,7 @@ func CreateCart(c *gin.Context) {
 		c.JSON(http.StatusOK, res)
 	} else {
 		c.JSON(http.StatusBadRequest, ErrorResponse(err))
-		util.LogrusObj.Infoln(err)
+		pkg_logger.LogrusObj.Infoln(err)
 	}
 }
 
@@ -33,7 +34,7 @@ func UpdateCart(c *gin.Context) {
 		c.JSON(http.StatusOK, res)
 	} else {
 		c.JSON(http.StatusBadRequest, ErrorResponse(err))
-		util.LogrusObj.Infoln(err)
+		pkg_logger.LogrusObj.Infoln(err)
 	}
 }
 
@@ -45,6 +46,6 @@ func DeleteCart(c *gin.Context) {
 		c.JSON(http.StatusOK, res)
 	} else {
 		c.JSON(http.StatusBadRequest, ErrorResponse(err))
-		util.LogrusObj.Infoln(err)
+		pkg_logger.LogrusObj.Infoln(err)
 	}
 }

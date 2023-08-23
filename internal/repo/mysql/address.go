@@ -1,6 +1,7 @@
 package mysql
 
 import (
+	"context"
 	"product-mall/internal/model"
 	"product-mall/pkg/db"
 
@@ -11,9 +12,9 @@ type addressRepo struct {
 	db *gorm.DB
 }
 
-func NewAddressRepo() *addressRepo {
+func NewAddressRepo(ctx context.Context) *addressRepo {
 	return &addressRepo{
-		db: db.GetDB(),
+		db: db.GetDBCtx(ctx),
 	}
 }
 
@@ -27,12 +28,12 @@ func (a *addressRepo) GetAddressByUid(user_id interface{}) (address []model.Addr
 }
 
 func (a *addressRepo) GetAddressById(id string) (address model.Address, err error) {
-	err = db.GetDB().Where("id = ?", id).Find(&address).Error
+	err = a.db.Where("id = ?", id).Find(&address).Error
 	return
 }
 
 func (a *addressRepo) DeleteAddress(address model.Address) error {
-	err := db.GetDB().Delete(&address).Error
+	err := a.db.Delete(&address).Error
 	return err
 }
 

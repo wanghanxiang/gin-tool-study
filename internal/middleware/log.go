@@ -1,9 +1,8 @@
 package middleware
 
 import (
+	"product-mall/pkg/pkg_logger"
 	"time"
-
-	util "product-mall/internal/tools"
 
 	"github.com/gin-gonic/gin"
 )
@@ -37,7 +36,7 @@ func Logger() gin.HandlerFunc {
 		referer := c.Request.Referer()
 
 		// 日志格式
-		util.LogrusObj.WithContext(c).Infof("[GIN]| %3d | %13v | %15s | %s | %s | %s | %s |",
+		pkg_logger.LogrusObj.WithContext(c).Infof("[GIN]| %3d | %13v | %15s | %s | %s | %s | %s |",
 			statusCode,
 			latencyTime,
 			clientIP,

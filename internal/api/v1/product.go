@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"product-mall/internal/service"
 	util "product-mall/internal/tools"
+	"product-mall/pkg/pkg_logger"
 
 	"github.com/gin-gonic/gin"
 )
@@ -22,7 +23,7 @@ func CreateProduct(c *gin.Context) {
 		c.JSON(http.StatusOK, res)
 	} else {
 		c.JSON(http.StatusBadRequest, ErrorResponse(err))
-		util.LogrusObj.Infoln(err)
+		pkg_logger.LogrusObj.Infoln(err)
 	}
 
 }

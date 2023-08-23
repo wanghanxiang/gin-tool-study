@@ -6,8 +6,7 @@ import (
 	"product-mall/internal/model"
 	"product-mall/pkg/db"
 	"product-mall/pkg/e"
-
-	logging "github.com/sirupsen/logrus"
+	"product-mall/pkg/pkg_logger"
 )
 
 /*
@@ -70,7 +69,7 @@ func (service *ProductService) Create(id uint, files []*multipart.FileHeader) dt
 	}
 	err := db.GetDB().Create(&product).Error
 	if err != nil {
-		logging.Info(err)
+		pkg_logger.LogrusObj.Errorln(err)
 		code = e.ErrorDatabase
 		return dto.Response{
 			Status: code,
@@ -123,7 +122,7 @@ func (service *ProductService) List() dto.Response {
 	//如果传入的商品的CategoryID为0的话
 	if service.CategoryID == 0 {
 		if err := db.GetDB().Model(model.Product{}).Count(&total).Error; err != nil {
-			logging.Info(err)
+			pkg_logger.LogrusObj.Errorln(err)
 			code = e.ErrorDatabase
 			return dto.Response{
 				Status: code,
@@ -134,7 +133,7 @@ func (service *ProductService) List() dto.Response {
 		if err := db.GetDB().Offset((service.PageNum - 1) * service.PageSize).
 			Limit(service.PageSize).Find(&products).
 			Error; err != nil {
-			logging.Info(err)
+			pkg_logger.LogrusObj.Errorln(err)
 			code = e.ErrorDatabase
 			return dto.Response{
 				Status: code,
@@ -148,7 +147,7 @@ func (service *ProductService) List() dto.Response {
 		if err := db.GetDB().Model(model.Product{}).Preload("Category").
 			Where("category_id = ?", service.CategoryID).
 			Count(&total).Error; err != nil {
-			logging.Info(err)
+			pkg_logger.LogrusObj.Errorln(err)
 			code = e.ErrorDatabase
 			return dto.Response{
 				Status: code,
@@ -162,7 +161,7 @@ func (service *ProductService) List() dto.Response {
 			Offset((service.PageNum - 1) * service.PageSize).
 			Limit(service.PageSize).
 			Find(&products).Error; err != nil {
-			logging.Info(err)
+			pkg_logger.LogrusObj.Errorln(err)
 			code = e.ErrorDatabase
 			return dto.Response{
 				Status: code,
@@ -182,7 +181,7 @@ func (service *ProductService) Delete(id string) dto.Response {
 	var product model.Product
 	//判断商品是否存在
 	if err := db.GetDB().First(&product, id).Error; err != nil {
-		logging.Info(err)
+		pkg_logger.LogrusObj.Errorln(err)
 		code = e.ErrorDatabase
 		return dto.Response{
 			Status: code,
@@ -192,7 +191,7 @@ func (service *ProductService) Delete(id string) dto.Response {
 	}
 	//存在则删除商品
 	if err := db.GetDB().Delete(&product).Error; err != nil {
-		logging.Info(err)
+		pkg_logger.LogrusObj.Errorln(err)
 		code = e.ErrorDatabase
 		return dto.Response{
 			Status: code,
@@ -223,7 +222,7 @@ func (service *ProductService) Update(id string) dto.Response {
 	code := e.SUCCESS
 
 	if err := db.GetDB().Save(&product).Error; err != nil {
-		logging.Info(err)
+		pkg_logger.LogrusObj.Errorln(err)
 		code = e.ErrorDatabase
 		return dto.Response{
 			Status: code,
@@ -249,7 +248,7 @@ func (service *ProductService) Search() dto.Response {
 		Offset((service.PageNum - 1) * service.PageSize).
 		Limit(service.PageSize).Find(&products).Error
 	if err != nil {
-		logging.Info(err)
+		pkg_logger.LogrusObj.Errorln(err)
 		code = e.ErrorDatabase
 		return dto.Response{
 			Status: code,

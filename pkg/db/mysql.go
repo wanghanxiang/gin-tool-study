@@ -7,13 +7,11 @@ import (
 	"os"
 	"product-mall/conf"
 	"product-mall/internal/model"
+	"product-mall/pkg/pkg_logger"
 	"time"
-
-	util "product-mall/internal/tools"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
 	"gorm.io/plugin/dbresolver"
 )
@@ -26,7 +24,7 @@ type ormLog struct{}
 func (l ormLog) Printf(format string, args ...interface{}) {
 	//if gin.Mode() == "dev" {
 	if conf.ENV == "dev" {
-		util.LogrusObj.Printf(format, args...)
+		pkg_logger.LogrusObj.Printf(format, args...)
 	} else {
 		log.Printf(format, args...)
 	}
@@ -42,10 +40,7 @@ func Database(connRead, connWrite string) *gorm.DB {
 		DontSupportRenameColumn:   true,     // 用 `change` 重命名列，MySQL 8 之前的数据库和 MariaDB 不支持重命名列
 		SkipInitializeWithVersion: false,    // 根据版本自动配置
 	}), &gorm.Config{
-		Logger: logger.New(ormLog{}, logger.Config{
-			SlowThreshold: time.Second,
-			LogLevel:      logger.Info,
-		}),
+		Logger: pkg_logger.NewGORMLogger(),
 		NamingStrategy: schema.NamingStrategy{
 			SingularTable: true,
 		},
@@ -66,7 +61,9 @@ func Database(connRead, connWrite string) *gorm.DB {
 			Policy:   dbresolver.RandomPolicy{},                                      // sources/replicas 负载均衡策略
 		}))
 	//迁移 schema
-	Migration()
+	if conf.ENV == "dev" {
+		Migration()
+	}
 	return DB
 }
 

@@ -3,6 +3,7 @@ package v1
 import (
 	"product-mall/internal/service"
 	util "product-mall/internal/tools"
+	"product-mall/pkg/pkg_logger"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,10 +14,10 @@ func CreateAddress(c *gin.Context) {
 	claim, _ := util.ParseToken(c.GetHeader("Cookie"))
 
 	if err := c.BindJSON(&service); err == nil {
-		res := service.Create(claim.ID)
+		res := service.Create(c, claim.ID)
 		c.JSON(200, res)
 	} else {
-		util.LogrusObj.Infoln(err)
+		pkg_logger.LogrusObj.Infoln(err)
 		c.JSON(400, ErrorResponse(err))
 	}
 }
@@ -24,8 +25,7 @@ func CreateAddress(c *gin.Context) {
 //展示收货地址
 func ShowAddresses(c *gin.Context) {
 	service := service.AddressService{}
-	util.LogrusObj.WithContext(c).Infof("ShowAddresses param %s", c.Param("id"))
-	res := service.Show(c.Param("id"))
+	res := service.Show(c, c.Param("id"))
 	c.JSON(200, res)
 }
 
@@ -34,10 +34,10 @@ func UpdateAddress(c *gin.Context) {
 	service := service.AddressService{}
 	claim, _ := util.ParseToken(c.GetHeader("Cookie"))
 	if err := c.BindJSON(&service); err == nil {
-		res := service.Update(claim.ID, c.Param("id"))
+		res := service.Update(c, claim.ID, c.Param("id"))
 		c.JSON(200, res)
 	} else {
-		util.LogrusObj.Infoln(err)
+		pkg_logger.LogrusObj.Infoln(err)
 		c.JSON(400, ErrorResponse(err))
 	}
 }
@@ -45,6 +45,6 @@ func UpdateAddress(c *gin.Context) {
 //删除收获地址
 func DeleteAddress(c *gin.Context) {
 	service := service.AddressService{}
-	res := service.Delete(c.Param("id"))
+	res := service.Delete(c, c.Param("id"))
 	c.JSON(200, res)
 }

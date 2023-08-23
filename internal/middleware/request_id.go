@@ -3,8 +3,7 @@ package middleware
 import (
 	"context"
 	"product-mall/internal/constants"
-
-	util "product-mall/internal/tools"
+	"product-mall/pkg/pkg_logger"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -25,7 +24,7 @@ func WithRequsetId() gin.HandlerFunc {
 		fields := logrus.Fields{}
 		if c.Request.Method == "GET" {
 			fields["param"] = c.Request.URL.Query()
-			util.LogrusObj.WithContext(c).WithFields(fields).Info("request param")
+			pkg_logger.LogrusObj.WithContext(c).WithFields(fields).Info("request param")
 		}
 		// if c.Request.Method == "POST" {
 		// 	// 使用GetRawData方法获取请求的body数据
@@ -34,7 +33,7 @@ func WithRequsetId() gin.HandlerFunc {
 		// 	if err == nil {
 		// 		// 打印请求的body数据
 		// 		fields["param"] = string(body)
-		// 		util.LogrusObj.WithContext(c).WithFields(fields).Info("request param")
+		// 		pkg_logger.LogrusObj.WithContext(c).WithFields(fields).Info("request param")
 		// 	}
 		// }
 

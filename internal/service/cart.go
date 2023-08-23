@@ -3,9 +3,10 @@ package service
 import (
 	"product-mall/internal/dto"
 	"product-mall/internal/model"
-	util "product-mall/internal/tools"
 	"product-mall/pkg/db"
 	"product-mall/pkg/e"
+	"product-mall/pkg/pkg_logger"
+
 	"strconv"
 )
 
@@ -25,7 +26,7 @@ func (service *CartService) Create(id string, uid uint) dto.Response {
 	code := e.SUCCESS
 	if err := db.GetDB().First(&product, id).Error; err != nil {
 		//商品信息不存在也包含在里面
-		util.LogrusObj.Infoln(err)
+		pkg_logger.LogrusObj.Infoln(err)
 		code = e.ErrorDatabase
 		return dto.Response{
 			Status: code,
@@ -49,7 +50,7 @@ func (service *CartService) Create(id string, uid uint) dto.Response {
 		}
 		err := db.GetDB().Create(&cart).Error
 		if err != nil {
-			util.LogrusObj.Infoln(err)
+			pkg_logger.LogrusObj.Infoln(err)
 			code = e.ErrorDatabase
 			return dto.Response{
 				Status: code,
@@ -68,7 +69,7 @@ func (service *CartService) Create(id string, uid uint) dto.Response {
 		cart.Num++
 		err := db.GetDB().Save(&cart).Error
 		if err != nil {
-			util.LogrusObj.Infoln(err)
+			pkg_logger.LogrusObj.Infoln(err)
 			return dto.Response{
 				Status: code,
 				Msg:    e.GetMsg(code),
@@ -97,7 +98,7 @@ func (service *CartService) Update(id string) dto.Response {
 	code := e.SUCCESS
 	err := db.GetDB().Where("id=?", id).Find(&cart).Error
 	if err != nil {
-		util.LogrusObj.Infoln(err)
+		pkg_logger.LogrusObj.Infoln(err)
 		code := e.ErrorDatabase
 		return dto.Response{
 			Status: code,
@@ -110,7 +111,7 @@ func (service *CartService) Update(id string) dto.Response {
 	cart.Num = service.Num
 	err = db.GetDB().Save(&cart).Error
 	if err != nil {
-		util.LogrusObj.Infoln(err)
+		pkg_logger.LogrusObj.Infoln(err)
 		code := e.ErrorDatabase
 		return dto.Response{
 			Status: code,
@@ -132,7 +133,7 @@ func (service *CartService) Delete(pid string, uid uint) dto.Response {
 	code := e.SUCCESS
 	err := db.GetDB().Where("user_id=? AND product_id=?", uid, pid).Error
 	if err != nil {
-		util.LogrusObj.Infoln(err)
+		pkg_logger.LogrusObj.Infoln(err)
 		code := e.ErrorDatabase
 		return dto.Response{
 			Status: code,
@@ -142,7 +143,7 @@ func (service *CartService) Delete(pid string, uid uint) dto.Response {
 	}
 	err = db.GetDB().Delete(&cart).Error
 	if err != nil {
-		util.LogrusObj.Infoln(err)
+		pkg_logger.LogrusObj.Infoln(err)
 		code := e.ErrorDatabase
 		return dto.Response{
 			Status: code,
@@ -164,9 +165,8 @@ func (service *CartService) List(userId string) dto.Response {
 	code := e.SUCCESS
 	err := db.GetDB().Where("user_id=?", userId).Find(&carts).Error
 
-	util.LogrusObj.Infoln("1111")
 	if err != nil {
-		util.LogrusObj.Infoln(err)
+		pkg_logger.LogrusObj.Infoln(err)
 		code := e.ErrorDatabase
 		return dto.Response{
 			Status: code,
