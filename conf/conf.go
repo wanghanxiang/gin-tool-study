@@ -2,7 +2,10 @@ package conf
 
 import (
 	"fmt"
+	"path"
+	"path/filepath"
 	"product-mall/cache"
+	"runtime"
 
 	"os"
 	"strings"
@@ -50,7 +53,13 @@ func Init() {
 		ENV = "dev"
 	}
 	fmt.Println("环境变量是", ENV)
-	configFilePath := fmt.Sprintf("./conf/app.%s.ini", ENV)
+	//获取当前目录
+	_, filename, _, _ := runtime.Caller(0)
+	dir := path.Dir(filename)
+	configFilePath := filepath.Join(dir, fmt.Sprintf("app.%s.ini", ENV))
+	localFilePath := filepath.Join(dir, "/locales/zh-cn.yaml")
+
+	fmt.Printf("configFilePath", configFilePath)
 
 	file, err := ini.Load(configFilePath)
 	if err != nil {
@@ -61,10 +70,11 @@ func Init() {
 	LoadRedisData(file)
 	LoadEmail(file)
 	LoadQinNiu(file)
-	if err := LoadLocales("conf/locales/zh-cn.yaml"); err != nil {
+	if err := LoadLocales(localFilePath); err != nil {
 		logging.Info(err) //日志内容
 		panic(err)
 	}
+	fmt.Println("resdis-----", RedisAddr, RedisDbName)
 	//redis
 	cache.NewRedis(RedisAddr, RedisDbName, "")
 
